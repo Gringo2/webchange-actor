@@ -10,6 +10,8 @@ export const InputSchema = z.object({
     useVisualProof: z.boolean().default(false),
     minSeverityToAlert: z.number().int().min(0).max(100).default(40),
     useAi: z.boolean().default(false),
+    enableHealing: z.boolean().default(true), // Sovereign: Enable Self-Correcting Selectors
+    generateDashboard: z.boolean().default(true), // Victory Lap: Premium HTML Report
     aiOptions: z.object({
         provider: z.enum(['openai', 'anthropic']).default('openai'),
         model: z.string().optional(),
@@ -21,9 +23,12 @@ export const InputSchema = z.object({
     }).optional(),
     proxyConfiguration: z.object({}).passthrough().optional(),
     slackWebhookUrl: z.string().url().optional(),
+    discordWebhookUrl: z.string().url().optional(),
+    waitForSelector: z.string().optional(),
     // V2 specific
     historyDepth: z.number().int().min(1).max(20).default(5),
     cooldownPeriodMinutes: z.number().int().min(0).default(60),
+    storageGroomingDays: z.number().int().min(1).default(30),
 });
 
 export type ActorInput = z.infer<typeof InputSchema>;
@@ -59,7 +64,7 @@ export interface DiffItem {
 export interface AnalysisResult {
     url: string;
     timestamp: string;
-    changeType: 'major' | 'minor' | 'none';
+    changeType: 'content_added' | 'content_removed' | 'content_modified' | 'structure_change' | 'no_change';
     severityScore: number;
     diffSummary: {
         text: string;
@@ -68,6 +73,26 @@ export interface AnalysisResult {
     aiAnalysis?: {
         summary: string;
         reasoning: string;
+        recommendation?: string; // Strategic Business Advice
+        pattern?: string; // God-Mode: Pattern Recognition
     };
     screenshotUrl?: string;
+    // Sovereign: Self-Correction Data
+    autoHealedSelector?: string;
+    // Spreadsheet-Optimized (Flat) Fields
+    productName?: string;
+    oldPrice?: number;
+    newPrice?: number;
+    changePercent?: number;
+    v2?: any;
+}
+
+export interface RunStats {
+    total: number;
+    changed: number;
+    filtered: number;
+    failed: number;
+    durationMs?: number;
+    healed?: number; // Sovereign: Number of healed selectors
+    dashboardUrl?: string; // Victory Lap: Link to generated KVS report
 }

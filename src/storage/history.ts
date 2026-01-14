@@ -8,9 +8,9 @@ export interface HistoryItem {
 }
 
 export class HistoryStore {
-    private async getStoreKey(url: string): Promise<string> {
+    private async getStoreKey(url: string, prefix = 'history'): Promise<string> {
         const hash = createHash('md5').update(url).digest('hex');
-        return `history_${hash}`;
+        return `${prefix}_${hash}`;
     }
 
     /**
@@ -43,6 +43,24 @@ export class HistoryStore {
 
         await store.setValue(key, updatedHistory);
         log.info(`📊 History updated for ${url} (Depth: ${updatedHistory.length}/${maxDepth})`);
+    }
+
+    /**
+     * God-Mode: Pattern Recognition Support
+     * Stores the last AI summaries to help spot recurring trends.
+     */
+    async pushSummary(url: string, summary: string, maxDepth: number = 5): Promise<void> {
+        const store = await Actor.openKeyValueStore('SWIM-SUMMARIES');
+        const key = await this.getStoreKey(url, 'sum');
+        const history = await this.getSummaries(url);
+        const updated = [summary, ...history].slice(0, maxDepth);
+        await store.setValue(key, updated);
+    }
+
+    async getSummaries(url: string): Promise<string[]> {
+        const store = await Actor.openKeyValueStore('SWIM-SUMMARIES');
+        const key = await this.getStoreKey(url, 'sum');
+        return (await store.getValue(key) as string[]) || [];
     }
 
     /**

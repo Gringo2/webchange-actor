@@ -1,0 +1,40 @@
+name: SWIM Expert Verification
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run LCS Accuracy Tests
+        run: npx tsx src/verify-batch.ts
+
+      - name: Run Context Extraction Tests
+        run: npx tsx src/verify-context.ts
+
+      - name: Run Operational Telemetry Tests
+        run: npx tsx src/verify-ops.ts
+
+      - name: Run Spreadsheet Optimization Tests
+        run: npx tsx src/verify-spreadsheet.ts
+
+      - name: Run Strategic & Performance Tests
+        run: npx tsx src/verify-strategic.ts
+
+      - name: Build Check
+        run: npm run build

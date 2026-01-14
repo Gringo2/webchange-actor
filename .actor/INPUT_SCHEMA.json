@@ -1,13 +1,13 @@
 {
-    "title": "SWIM: Semantic Web Intelligent Monitor",
-    "description": "AI-powered semantic web change monitor.",
+    "title": "SWIM: Semantic Web Intelligent Monitor (Sovereign)",
+    "description": "Unbreakable, AI-powered semantic web monitoring and strategic pattern recognition.",
     "type": "object",
     "schemaVersion": 1,
     "properties": {
         "targetUrl": {
             "title": "Target URL(s)",
             "type": "array",
-            "description": "The URL(s) of the page(s) you want to monitor.",
+            "description": "The URL(s) of the page(s) you want to monitor. Supports batch processing.",
             "editor": "stringList",
             "prefill": [
                 "https://example.com"
@@ -41,8 +41,16 @@
         "useVisualProof": {
             "title": "Enable Visual Proof",
             "type": "boolean",
-            "description": "Capture context-aware screenshots with change highlighting.",
-            "default": false
+            "description": "Capture context-aware screenshots highlight changes in Red and identifiers in Blue.",
+            "default": false,
+            "groupCaption": "Visual Quality Control"
+        },
+        "waitForSelector": {
+            "title": "Wait for Selector",
+            "type": "string",
+            "description": "Optional: Wait for this CSS selector before taking the screenshot (useful for slow dynamic content).",
+            "editor": "textfield",
+            "groupCaption": "Visual Quality Control"
         },
         "minSeverityToAlert": {
             "title": "Min Severity Threshold",
@@ -57,6 +65,18 @@
             "type": "boolean",
             "description": "Enable AI to interpret and summarize changes (recommended for business users).",
             "default": false
+        },
+        "enableHealing": {
+            "title": "Sovereign: Enable Semantic Healing",
+            "type": "boolean",
+            "description": "Automatically recover from website structural changes using AI self-correction.",
+            "default": true
+        },
+        "generateDashboard": {
+            "title": "Victory Lap: Generate Hub Dashboard",
+            "type": "boolean",
+            "description": "Create a premium, dark-mode 'War Room' HTML report at the end of the run.",
+            "default": true
         },
         "aiOptions": {
             "title": "🤖 AI Configuration",
@@ -86,6 +106,13 @@
             "editor": "textfield",
             "sectionCaption": "Notifications"
         },
+        "discordWebhookUrl": {
+            "title": "Discord Webhook URL",
+            "type": "string",
+            "description": "Send rich, color-coded alerts directly to your Discord channel.",
+            "editor": "textfield",
+            "sectionCaption": "Notifications"
+        },
         "notificationConfig": {
             "title": "Custom Webhook",
             "type": "object",
@@ -109,6 +136,13 @@
             "type": "integer",
             "description": "Number of historical snapshots to retain (prevents drift).",
             "default": 5,
+            "sectionCaption": "Advanced Persistence"
+        },
+        "storageGroomingDays": {
+            "title": "Storage Grooming (Days)",
+            "type": "integer",
+            "description": "Automatically prune snapshots and history older than this many days.",
+            "default": 30,
             "sectionCaption": "Advanced Persistence"
         }
     },

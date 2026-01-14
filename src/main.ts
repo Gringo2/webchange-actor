@@ -1,6 +1,7 @@
 import { Actor, log } from 'apify';
 import { CheerioFetcher } from './core/fetcher.js';
 import { SlackNotifier } from './notifications/slack.js';
+import { DiscordNotifier } from './notifications/discord.js';
 import { VisualProofer } from './core/visual-proofer.js';
 import { Preprocessor } from './core/preprocessor.js';
 import { DiffEngine } from './core/diff.js';
@@ -9,12 +10,15 @@ import { Scorer } from './core/scorer.js';
 import { SnapshotManager } from './storage/state.js';
 import { AIInterpreter } from './intelligence/ai.js';
 import { PRESETS, DEFAULT_INPUT } from './config.js';
-import { InputSchema, AnalysisResult } from './types.js';
+import { InputSchema, AnalysisResult, RunStats } from './types.js';
 import { gotScraping } from 'got-scraping';
 import { HistoryStore } from './storage/history.js';
 import { Deduplicator } from './intelligence/deduplicator.js';
+import { DashboardGenerator } from './core/dashboard.js';
 
 await Actor.init();
+
+const startTime = Date.now();
 
 try {
     // 1. Load and Validate Input
@@ -25,19 +29,68 @@ try {
     // Normalize targetUrl to array for batch processing
     const targetUrls = Array.isArray(input.targetUrl) ? input.targetUrl : [input.targetUrl];
 
-    log.info(`🚀 Starting SWIM Batch run for ${targetUrls.length} URL(s) (Preset: ${input.preset})`);
+    log.info(`🚀 Starting SWIM Sovereign Batch run for ${targetUrls.length} URL(s)`);
 
     const fetcher = new CheerioFetcher();
     const stateManager = new SnapshotManager();
     const historyStore = new HistoryStore();
     const deduplicator = new Deduplicator();
 
+    // Multi-Channel Notifiers
+    const slack = input.slackWebhookUrl ? new SlackNotifier(input.slackWebhookUrl) : null;
+    const discord = input.discordWebhookUrl ? new DiscordNotifier(input.discordWebhookUrl) : null;
+
+    const stats: RunStats = {
+        total: targetUrls.length,
+        changed: 0,
+        filtered: 0,
+        failed: 0,
+        healed: 0
+    };
+
+    // Results accumulator for the Dashboard
+    const batchResults: AnalysisResult[] = [];
+
+    // Global selector that can be "Healed" during the run
+    let activeSelector = input.cssSelector;
+
     for (const url of targetUrls) {
         log.info(`🔍 Processing: ${url}`);
 
         try {
-            // 2. Fetch and Preprocess
-            const { html: rawHtml } = await fetcher.fetch(url, input.cssSelector, input.proxyConfiguration);
+            // 2. Fetch Content (with Semantic Healing check)
+            let { html: rawHtml } = await fetcher.fetch(url, activeSelector, input.proxyConfiguration);
+
+            // Sovereign: Semantic Healing Logic
+            let autoHealedSelector: string | undefined;
+            if (activeSelector && rawHtml.trim() === '' && input.enableHealing && input.useAi && input.aiOptions?.apiKey) {
+                log.warning(`🧯 Selector '${activeSelector}' failed. Attempting Sovereign Healing...`);
+
+                // Fetch whole page to scan for the replacement
+                const { html: fullHtml } = await fetcher.fetch(url, undefined, input.proxyConfiguration);
+                const ai = new AIInterpreter({
+                    apiKey: input.aiOptions.apiKey,
+                    model: input.aiOptions.model,
+                });
+
+                // Use preset ID or existing results as context
+                const semanticContext = preset.id.replace(/-/g, ' ');
+                const healed = await ai.healSelector(activeSelector, semanticContext, fullHtml);
+
+                if (healed) {
+                    log.info(`✨ Healing SUCCESS: New selector found -> '${healed}'`);
+                    activeSelector = healed;
+                    autoHealedSelector = healed;
+                    stats.healed = (stats.healed || 0) + 1;
+
+                    // Re-fetch with healed selector
+                    const reFetch = await fetcher.fetch(url, activeSelector, input.proxyConfiguration);
+                    rawHtml = reFetch.html;
+                } else {
+                    log.error(`❌ Healing failed. The site might have changed beyond recognition.`);
+                }
+            }
+
             const normalizedHtml = Preprocessor.normalize(rawHtml, {
                 excludeSelectors: preset.rules.excludeSelectors,
             });
@@ -49,6 +102,9 @@ try {
                 log.info(`📝 No previous snapshot for ${url}. Saving baseline.`);
                 await stateManager.save(url, normalizedHtml);
                 await Actor.pushData({ url, timestamp: new Date().toISOString(), changeDetected: false, message: 'Initial baseline created.' });
+
+                if (slack) await slack.sendBaseline(url);
+                if (discord) await discord.sendBaseline(url);
                 continue;
             }
 
@@ -72,33 +128,55 @@ try {
                 await deduplicator.recordEvent(eventHash);
             }
 
-            // 6. Optional AI Interpretation (Only for non-duplicates and significant changes)
+            // 6. God-Mode: Pattern-Aware AI Analysis
             let aiAnalysis;
             const meetsThreshold = severityScore >= input.minSeverityToAlert;
 
             if (!isDuplicate && meetsThreshold && input.useAi && input.aiOptions?.apiKey) {
-                log.info(`🤖 Invoking AI for significant change on ${url} (Severity: ${severityScore})`);
                 const ai = new AIInterpreter({
                     apiKey: input.aiOptions.apiKey,
                     model: input.aiOptions.model,
                 });
-                aiAnalysis = await ai.analyze(diffs, preset);
+
+                const historySummaries = await historyStore.getSummaries(url);
+                aiAnalysis = await ai.analyze(diffs, preset, historySummaries);
+
+                if (aiAnalysis.summary) {
+                    await historyStore.pushSummary(url, aiAnalysis.summary, 10);
+                }
             }
 
             // V2 History Management
             await historyStore.push(url, normalizedHtml, input.historyDepth);
             const history = await historyStore.getHistory(url);
 
-            // 7. Conditional Visual Proof (With Context Highlighting)
+            // 7. Conditional Visual Proof
             let screenshotUrl: string | undefined;
             if (!isDuplicate && meetsThreshold && input.useVisualProof) {
-                // Find priority selectors for highlighting
                 const firstDiff = diffs[0];
-                const snapshotSelector = input.cssSelector || firstDiff.selector;
+                const snapshotSelector = activeSelector || firstDiff.selector;
                 const contextSelector = firstDiff.contextPath;
 
-                log.info(`📸 Capturing context-aware visual proof... (Context: ${firstDiff.context})`);
-                screenshotUrl = await VisualProofer.capture(url, snapshotSelector, contextSelector) || undefined;
+                screenshotUrl = await VisualProofer.capture(url, snapshotSelector, contextSelector, input.waitForSelector) || undefined;
+            }
+
+            // Spreadsheet Optimization Logic
+            const priceDiff = diffs.find(d => d.type === 'modified' && (d.old?.includes('$') || d.new?.includes('$') || d.selector.includes('price')));
+            let oldPrice: number | undefined;
+            let newPrice: number | undefined;
+            let changePercent: number | undefined;
+
+            if (priceDiff) {
+                const parsePrice = (val: string | null) => {
+                    if (!val) return undefined;
+                    const num = parseFloat(val.replace(/[^0-9.]/g, ''));
+                    return isNaN(num) ? undefined : num;
+                };
+                oldPrice = parsePrice(priceDiff.old);
+                newPrice = parsePrice(priceDiff.new);
+                if (oldPrice && newPrice && oldPrice !== 0) {
+                    changePercent = parseFloat(((newPrice - oldPrice) / oldPrice * 100).toFixed(2));
+                }
             }
 
             // 8. Format Result
@@ -113,7 +191,22 @@ try {
                 },
                 aiAnalysis,
                 screenshotUrl,
+                autoHealedSelector,
+                // Flattened Export Fields
+                productName: diffs[0]?.context,
+                oldPrice,
+                newPrice,
+                changePercent,
+                v2: {
+                    isDuplicate,
+                    deduplicationHash: eventHash,
+                    historyDepth: input.historyDepth,
+                    relatedSnapshots: history.map(h => h.timestamp),
+                    reasons,
+                }
             };
+
+            batchResults.push(result);
 
             // 9. Save State and Push Result
             await stateManager.save(url, normalizedHtml);
@@ -124,20 +217,20 @@ try {
                     isDuplicate,
                     meetsThreshold,
                     preset: input.preset,
+                    runtimeSec: Math.round((Date.now() - startTime) / 1000),
+                    healed: !!autoHealedSelector
                 },
             });
 
-            // 10. Notifications (Filter by Noise Threshold)
+            // Update Stats
+            stats.changed++;
+            if (!meetsThreshold) stats.filtered++;
+
+            // 10. Multi-Channel Notifications
             if (!isDuplicate && meetsThreshold) {
-                log.info(`🔔 Severity ${severityScore} exceeds threshold ${input.minSeverityToAlert}. Sending alerts...`);
+                if (slack) await slack.send(result);
+                if (discord) await discord.send(result);
 
-                // 10a. Slack
-                if (input.slackWebhookUrl) {
-                    const slack = new SlackNotifier(input.slackWebhookUrl);
-                    await slack.send(result);
-                }
-
-                // 10b. Generic Webhook
                 if (input.notificationConfig?.webhookUrl) {
                     try {
                         await gotScraping.post(input.notificationConfig.webhookUrl, {
@@ -148,14 +241,35 @@ try {
                         log.error(`❌ Webhook failed for ${url}: ${(e as Error).message}`);
                     }
                 }
-            } else if (!meetsThreshold) {
-                log.info(`🔇 Skipping alerts for ${url}: Severity ${severityScore} is below threshold ${input.minSeverityToAlert}`);
             }
 
         } catch (urlError) {
-            log.error(`❌ Error processing ${url}: ${(urlError as Error).message}`);
+            stats.failed++;
+            const err = urlError as Error;
+            log.error(`❌ Error processing ${url}: ${err.message}`);
+
+            if (slack) await slack.sendError(url, err.message);
+            if (discord) await discord.sendError(url, err.message);
         }
     }
+
+    // Finalize Stats
+    stats.durationMs = Date.now() - startTime;
+
+    // Victory Lap: Launchpad (Premium Dashboard)
+    if (batchResults.length > 0 && input.generateDashboard) {
+        stats.dashboardUrl = await DashboardGenerator.generate(batchResults, stats);
+    }
+
+    // 11. Final Batch Summaries
+    if (targetUrls.length > 1 || stats.dashboardUrl) {
+        if (slack) await slack.sendBatchSummary(stats);
+        if (discord) await discord.sendBatchSummary(stats);
+    }
+
+    // 12. Storage Grooming
+    const pruned = await stateManager.prune(input.storageGroomingDays);
+    if (pruned > 0) log.info(`✨ Pruned ${pruned} old snapshot(s).`);
 
     await Actor.exit();
 

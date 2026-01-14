@@ -7,7 +7,7 @@ console.log('🧪 Starting Batch & Threshold Verification...');
 const singleInput = {
     targetUrl: "https://google.com",
     preset: "generic",
-    slackWebhookUrl: "https://hooks.slack.com/xyz"
+    slackWebhookUrl: "https://hooks.slack.com/services/REDACTED_BY_SWIM"
 };
 
 const batchInput = {

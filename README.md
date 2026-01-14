@@ -1,19 +1,20 @@
-# <img src="./docs/assets/logo.svg" width="60" height="60" align="center" /> SWIM: Competitor Pricing Change Monitor (V1.2 Elite)
+# <img src="./docs/assets/logo.svg" width="60" height="60" align="center" /> SWIM: Semantic Web Intelligent Monitor (V1.2 Sovereign)
 
-**Don't just detect changes. Understand them.**
+**Unbreakable. Undetectable. Autonomous.**
 
-SWIM (Semantic Web Intelligent Monitor) is a production-grade Apify Actor designed for high-accuracy tracking of pricing, inventory, and SEO shifts. Unlike standard scrapers, SWIM uses a structural diff engine (LCS) to ignore noise and focus on revenue-impacting data.
+SWIM (Semantic Web Intelligent Monitor) is an enterprise-grade Apify Actor designed for high-accuracy tracking of pricing, inventory, and strategic shifts. The **Sovereign Edition** introduces autonomous self-healing and advanced anti-blocking, making your monitoring infrastructure virtually immune to website structural changes and bot-detection.
 
 ---
 
-## 💎 Key Features (V1.2 Elite)
+## 💎 Sovereign Features (V1.2)
 
--   **Batch Monitoring**: High-scale loop that monitors multiple competitor URLs in a single run.
--   **LCS Diff Engine**: Structural diff stability that handles list insertions and shifting layouts without false alerts.
--   **Noise Guard**: Severity-based filtering (`minSeverityToAlert`) to suppress insignificant 1-cent changes.
--   **Visual Proof**: Context-aware screenshots that highlight both the change (Red) and the product identifier (Blue).
--   **AI Intelligence**: (Optional) LLM-powered interpretation of changes with semantic product attribution.
--   **Auto-Persistence**: Named Key-Value Stores preserve state safely across scheduled cron runs.
+-   **Semantic Healing**: Automatically recovers broken CSS selectors using AI, ensuring uninterrupted monitoring when sites change their design.
+-   **Stealth Mode**: Advanced anti-blocking with randomized fingerprints, HTTP2, and session mimicking to bypass sophisticated scraping guards.
+-   **Pattern Spotter**: AI-powered trend analysis that identifies recurring business cycles (e.g., weekend sales) across multiple runs.
+-   **Batch Monitoring**: High-scale loop that monitors multiple competitor URLs in a single run with performance telemetry.
+-   **Visual Proof**: Context-aware screenshots with dual-color highlighting (Red: Changes, Blue: Context).
+-   **Multi-Channel Strategy**: Native rich notifications for both Slack and Discord webhooks.
+-   **Storage Hygiene**: Automated state grooming to prune old snapshots and minimize storage overhead.
 
 ---
 
@@ -44,7 +45,7 @@ For deep technical details, operational strategies, and setup guides, visit the 
 {
     "targetUrl": ["https://site1.com/p1", "https://site2.com/p2"],
     "preset": "competitor-pricing",
-    "slackWebhookUrl": "https://hooks.slack.com/services/...",
+    "slackWebhookUrl": "https://hooks.slack.com/services/YOUR_WEBHOOK_URL",
     "minSeverityToAlert": 50,
     "useVisualProof": true
 }
