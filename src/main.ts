@@ -20,11 +20,10 @@ try {
     const input = InputSchema.parse({ ...DEFAULT_INPUT, ...rawInput });
     const preset = PRESETS[input.preset];
 
-    Actor.log.info(`🚀 Starting SWIM for: ${input.targetUrl} (Preset: ${input.preset})`);
+    log.info(`🚀 Starting SWIM for: ${input.targetUrl} (Preset: ${input.preset})`);
 
     // 2. Fetch and Preprocess
     const fetcher = new CheerioFetcher();
-    const preprocessor = new Preprocessor();
     const stateManager = new SnapshotManager();
     const historyStore = new HistoryStore();
     const deduplicator = new Deduplicator();
@@ -38,7 +37,7 @@ try {
     const previousHtml = await stateManager.getPrevious(input.targetUrl);
 
     if (!previousHtml) {
-        Actor.log.info('📝 No previous snapshot found. Saving current state as baseline.');
+        log.info('📝 No previous snapshot found. Saving current state as baseline.');
         await stateManager.save(input.targetUrl, normalizedHtml);
 
         await Actor.pushData({
@@ -51,7 +50,7 @@ try {
         await Actor.exit();
     } else {
         // 4. Generate Diff
-        const diffs = DiffEngine.compare(previousHtml, normalizedHtml);
+        const diffs = DiffEngine.compare(previousHtml, normalizedHtml, preset);
 
 
         // 5. Semantic Analysis
@@ -69,7 +68,7 @@ try {
         // 6. Optional AI Interpretation
         let aiAnalysis;
         if (!isDuplicate && input.useAi && input.aiOptions?.apiKey && diffs.length > 0) {
-            Actor.log.info('🤖 Invoking AI Interpreter...');
+            log.info('🤖 Invoking AI Interpreter...');
             const aiOptions = input.aiOptions!;
             const ai = new AIInterpreter({
                 apiKey: aiOptions.apiKey!,
@@ -107,25 +106,43 @@ try {
 
         // 8. Save State and Push Result
         if (result.changeDetected) {
-            Actor.log.info(`🔔 Change detected! Severity: ${severityScore}/100`);
+            log.info(`🔔 Change detected! Severity: ${severityScore}/100`);
             await stateManager.save(input.targetUrl, normalizedHtml);
         }
 
         await Actor.pushData(result);
 
-        // 9. Webhook Notification
+        // 9. Webhook Notification with Retry Logic
         if (!isDuplicate && input.notificationConfig?.webhookUrl && result.changeDetected && severityScore >= 50) {
             log.info(`📧 Sending webhook notification to: ${input.notificationConfig.webhookUrl}`);
-            try {
-                await gotScraping.post(input.notificationConfig.webhookUrl, {
-                    json: result,
-                    headers: input.notificationConfig.authHeader ? {
-                        'Authorization': input.notificationConfig.authHeader
-                    } : {},
-                });
-                log.info('✅ Webhook delivered.');
-            } catch (webhookError) {
-                log.error(`❌ Webhook delivery failed: ${(webhookError as Error).message}`);
+
+            const maxRetries = 3;
+            let attempt = 0;
+            let success = false;
+
+            while (attempt < maxRetries && !success) {
+                try {
+                    await gotScraping.post(input.notificationConfig.webhookUrl, {
+                        json: result,
+                        headers: input.notificationConfig.authHeader ? {
+                            'Authorization': input.notificationConfig.authHeader
+                        } : {},
+                        timeout: { request: 10000 },
+                    });
+                    log.info('✅ Webhook delivered successfully.');
+                    success = true;
+                } catch (webhookError) {
+                    attempt++;
+                    const err = webhookError as Error;
+
+                    if (attempt < maxRetries) {
+                        const backoffMs = Math.pow(2, attempt) * 1000; // Exponential backoff: 2s, 4s, 8s
+                        log.warning(`❌ Webhook delivery failed (attempt ${attempt}/${maxRetries}): ${err.message}. Retrying in ${backoffMs / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, backoffMs));
+                    } else {
+                        log.error(`❌ Webhook delivery failed after ${maxRetries} attempts: ${err.message}`);
+                    }
+                }
             }
         }
 
@@ -141,6 +158,6 @@ try {
         timestamp: new Date().toISOString(),
     });
 
-    await Actor.exit();
+    await Actor.fail(err.message);
 }
 

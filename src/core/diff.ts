@@ -1,12 +1,12 @@
 import * as cheerio from 'cheerio';
-import { DiffItem } from '../types.js';
+import { DiffItem, PresetConfig } from '../types.js';
 
 export class DiffEngine {
     /**
      * Simple structural diff between two HTML snippets.
      * Note: This is a V1 implementation focusing on changed nodes.
      */
-    static compare(oldHtml: string, newHtml: string): DiffItem[] {
+    static compare(oldHtml: string, newHtml: string, preset?: PresetConfig): DiffItem[] {
         const $old = cheerio.load(oldHtml) as any;
         const $new = cheerio.load(newHtml) as any;
         const diffs: DiffItem[] = [];
@@ -27,7 +27,10 @@ export class DiffEngine {
             return results;
         };
 
-        const selectorsToWatch = ['h1', 'h2', 'h3', 'p', '.price', '.amount', 'li'];
+        // Use preset-specific selectors if available, otherwise use default comprehensive set
+        const selectorsToWatch = preset?.rules.includeSelectors.length
+            ? [...new Set([...preset.rules.includeSelectors, 'h1', 'h2', 'h3', 'p', 'li'])]
+            : ['h1', 'h2', 'h3', 'p', '.price', '.amount', 'li'];
 
         selectorsToWatch.forEach(sel => {
             const oldNodes = extractNodes(sel, $old);

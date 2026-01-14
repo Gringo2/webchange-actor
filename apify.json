@@ -1,8 +1,20 @@
 {
     "name": "semantic-web-intelligent-monitor-swim",
-    "version": "1.0",
+    "title": "SWIM - Semantic Web Intelligent Monitor",
+    "description": "AI-powered change detection for web pages with deduplication and semantic analysis",
+    "version": "1.0.0",
     "buildTag": "latest",
     "dockerfile": "./Dockerfile",
+    "input": "./.actor/INPUT_SCHEMA.json",
+    "categories": [
+        "MONITORING",
+        "AI"
+    ],
+    "storages": {
+        "dataset": {
+            "actorSpecification": 1
+        }
+    },
     "env": {
         "npm_config_loglevel": "warn"
     }
