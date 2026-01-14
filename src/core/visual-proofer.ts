@@ -3,7 +3,7 @@ import { KeyValueStore } from 'apify';
 import { log } from 'apify';
 
 export class VisualProofer {
-    static async capture(url: string, selector: string | undefined): Promise<string | null> {
+    static async capture(url: string, selector: string | undefined, contextSelector?: string): Promise<string | null> {
         let browser;
         try {
             log.info('📸 Starting Visual Proof capture...');
@@ -26,14 +26,24 @@ export class VisualProofer {
                     await page.waitForSelector(selector, { timeout: 5000 });
                     const element = await page.$(selector);
                     if (element) {
-                        // Add red border style for emphasis
-                        await page.evaluate((sel) => {
-                            const el = document.querySelector(sel);
-                            if (el instanceof HTMLElement) {
-                                el.style.border = '5px solid red';
-                                el.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
+                        // Add highlighting for both delta and context
+                        await page.evaluate((sel, ctxSel) => {
+                            const mainEl = document.querySelector(sel);
+                            if (mainEl instanceof HTMLElement) {
+                                mainEl.style.border = '5px solid red';
+                                mainEl.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
+                                mainEl.style.zIndex = '9999';
                             }
-                        }, selector);
+
+                            if (ctxSel) {
+                                const ctxEl = document.querySelector(ctxSel);
+                                if (ctxEl instanceof HTMLElement) {
+                                    ctxEl.style.border = '5px solid #007bff';
+                                    ctxEl.style.boxShadow = '0 0 15px rgba(0, 123, 255, 0.4)';
+                                    ctxEl.style.zIndex = '9998';
+                                }
+                            }
+                        }, selector, contextSelector || '');
 
                         screenshotBuffer = await element.screenshot();
                     } else {

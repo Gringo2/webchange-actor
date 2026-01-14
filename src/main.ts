@@ -22,179 +22,145 @@ try {
     const input = InputSchema.parse({ ...DEFAULT_INPUT, ...rawInput });
     const preset = PRESETS[input.preset];
 
-    log.info(`🚀 Starting SWIM for: ${input.targetUrl} (Preset: ${input.preset})`);
+    // Normalize targetUrl to array for batch processing
+    const targetUrls = Array.isArray(input.targetUrl) ? input.targetUrl : [input.targetUrl];
 
-    // 2. Fetch and Preprocess
+    log.info(`🚀 Starting SWIM Batch run for ${targetUrls.length} URL(s) (Preset: ${input.preset})`);
+
     const fetcher = new CheerioFetcher();
     const stateManager = new SnapshotManager();
     const historyStore = new HistoryStore();
     const deduplicator = new Deduplicator();
 
-    const { html: rawHtml } = await fetcher.fetch(input.targetUrl, input.cssSelector, input.proxyConfiguration);
-    const normalizedHtml = Preprocessor.normalize(rawHtml, {
-        excludeSelectors: preset.rules.excludeSelectors,
-    });
+    for (const url of targetUrls) {
+        log.info(`🔍 Processing: ${url}`);
 
-    // 3. Compare with Previous Snapshot
-    const previousHtml = await stateManager.getPrevious(input.targetUrl);
-
-    if (!previousHtml) {
-        log.info('📝 No previous snapshot found. Saving current state as baseline.');
-        await stateManager.save(input.targetUrl, normalizedHtml);
-
-        await Actor.pushData({
-            url: input.targetUrl,
-            timestamp: new Date().toISOString(),
-            changeDetected: false,
-            message: 'Initial snapshot created. Monitoring will start from the next run.',
-        });
-
-        await Actor.exit();
-    } else {
-        // 4. Generate Diff
-        const diffs = DiffEngine.compare(previousHtml, normalizedHtml, preset);
-
-
-        // 5. Semantic Analysis
-        const changeType = SemanticClassifier.classify(diffs, preset);
-        const { score: severityScore, reasons } = Scorer.calculateSeverity(diffs, preset);
-
-        // V2 Deduplication
-        const eventHash = Deduplicator.generateEventHash(input.targetUrl, diffs, severityScore);
-        const isDuplicate = await deduplicator.isDuplicate(eventHash, input.cooldownPeriodMinutes / 60);
-
-        if (!isDuplicate && diffs.length > 0) {
-            await deduplicator.recordEvent(eventHash);
-        }
-
-        // 6. Optional AI Interpretation
-        let aiAnalysis;
-        if (!isDuplicate && input.useAi && input.aiOptions?.apiKey && diffs.length > 0) {
-            log.info('🤖 Invoking AI Interpreter...');
-            const aiOptions = input.aiOptions!;
-            const ai = new AIInterpreter({
-                apiKey: aiOptions.apiKey!,
-                model: aiOptions.model,
+        try {
+            // 2. Fetch and Preprocess
+            const { html: rawHtml } = await fetcher.fetch(url, input.cssSelector, input.proxyConfiguration);
+            const normalizedHtml = Preprocessor.normalize(rawHtml, {
+                excludeSelectors: preset.rules.excludeSelectors,
             });
-            aiAnalysis = await ai.analyze(diffs, preset);
-        }
 
-        // V2 History Management
-        if (diffs.length > 0) {
-            await historyStore.push(input.targetUrl, normalizedHtml, input.historyDepth);
-        }
-        const history = await historyStore.getHistory(input.targetUrl);
+            // 3. Compare with Previous Snapshot
+            const previousHtml = await stateManager.getPrevious(url);
 
-        // 6b. Conditional Visual Proof
-        let visualProofUrl: string | undefined;
-        if (!isDuplicate && diffs.length > 0 && input.useVisualProof) {
-            // Priority: 1. User specified selector, 2. First matching preset include selector, 3. Undefined (Full page)
-            let snapshotSelector = input.cssSelector;
-            if (!snapshotSelector && preset.rules.includeSelectors.length > 0) {
-                // Heuristic: Use the first selector from the preset that actually appeared in the diffs
-                const firstMatchingDiff = diffs.find(d =>
-                    preset.rules.includeSelectors.some(s => d.selector.includes(s))
-                );
-                snapshotSelector = firstMatchingDiff?.selector || preset.rules.includeSelectors[0];
+            if (!previousHtml) {
+                log.info(`📝 No previous snapshot for ${url}. Saving baseline.`);
+                await stateManager.save(url, normalizedHtml);
+                await Actor.pushData({ url, timestamp: new Date().toISOString(), changeDetected: false, message: 'Initial baseline created.' });
+                continue;
             }
 
-            visualProofUrl = await VisualProofer.capture(input.targetUrl, snapshotSelector) || undefined;
-        }
+            // 4. Generate Diff
+            const diffs = DiffEngine.compare(previousHtml, normalizedHtml, preset);
 
-        // 7. Format Output
-        const result: AnalysisResult = {
-            url: input.targetUrl,
-            timestamp: new Date().toISOString(),
-            changeDetected: diffs.length > 0,
-            severityScore,
-            changeType,
-            diffSummary: {
-                text: Preprocessor.extractText(normalizedHtml),
-                structured: diffs,
-            },
-            aiAnalysis,
-            visualProofUrl,
-            v2: {
-                isDuplicate,
-                deduplicationHash: eventHash,
-                historyDepth: input.historyDepth,
-                relatedSnapshots: history.map(h => h.timestamp),
-                reasons,
-            },
-        };
-
-        // 8. Save State and Push Result
-        if (result.changeDetected) {
-            log.info(`🔔 Change detected! Severity: ${severityScore}/100`);
-            await stateManager.save(input.targetUrl, normalizedHtml);
-        }
-
-        await Actor.pushData({
-            ...result,
-            '#debug': {
-                requestId: Actor.getEnv().actorRunId,
-                preset: input.preset,
-                useAi: input.useAi,
-                useVisualProof: input.useVisualProof,
-            },
-        });
-
-        // 9. Notifications
-        if (!isDuplicate && result.changeDetected && severityScore >= 50) {
-            // 9a. Slack Notification (Rich)
-            if (input.slackWebhookUrl) {
-                log.info(`💬 Sending rich Slack notification to: ${input.slackWebhookUrl}`);
-                const slack = new SlackNotifier(input.slackWebhookUrl);
-                await slack.send(result);
+            if (diffs.length === 0) {
+                log.info(`✅ No changes detected for: ${url}`);
+                continue;
             }
 
-            // 9b. Generic Webhook Notification
-            if (input.notificationConfig?.webhookUrl) {
-                log.info(`📧 Sending webhook notification to: ${input.notificationConfig.webhookUrl}`);
+            // 5. Semantic Analysis
+            const changeType = SemanticClassifier.classify(diffs, preset);
+            const { score: severityScore, reasons } = Scorer.calculateSeverity(diffs, preset);
 
-                const maxRetries = 3;
-                let attempt = 0;
-                let success = false;
+            // V2 Deduplication
+            const eventHash = Deduplicator.generateEventHash(url, diffs, severityScore);
+            const isDuplicate = await deduplicator.isDuplicate(eventHash, input.cooldownPeriodMinutes / 60);
 
-                while (attempt < maxRetries && !success) {
+            if (!isDuplicate) {
+                await deduplicator.recordEvent(eventHash);
+            }
+
+            // 6. Optional AI Interpretation (Only for non-duplicates and significant changes)
+            let aiAnalysis;
+            const meetsThreshold = severityScore >= input.minSeverityToAlert;
+
+            if (!isDuplicate && meetsThreshold && input.useAi && input.aiOptions?.apiKey) {
+                log.info(`🤖 Invoking AI for significant change on ${url} (Severity: ${severityScore})`);
+                const ai = new AIInterpreter({
+                    apiKey: input.aiOptions.apiKey,
+                    model: input.aiOptions.model,
+                });
+                aiAnalysis = await ai.analyze(diffs, preset);
+            }
+
+            // V2 History Management
+            await historyStore.push(url, normalizedHtml, input.historyDepth);
+            const history = await historyStore.getHistory(url);
+
+            // 7. Conditional Visual Proof (With Context Highlighting)
+            let screenshotUrl: string | undefined;
+            if (!isDuplicate && meetsThreshold && input.useVisualProof) {
+                // Find priority selectors for highlighting
+                const firstDiff = diffs[0];
+                const snapshotSelector = input.cssSelector || firstDiff.selector;
+                const contextSelector = firstDiff.contextPath;
+
+                log.info(`📸 Capturing context-aware visual proof... (Context: ${firstDiff.context})`);
+                screenshotUrl = await VisualProofer.capture(url, snapshotSelector, contextSelector) || undefined;
+            }
+
+            // 8. Format Result
+            const result: AnalysisResult = {
+                url,
+                timestamp: new Date().toISOString(),
+                changeType,
+                severityScore,
+                diffSummary: {
+                    text: Preprocessor.extractText(normalizedHtml),
+                    structured: diffs,
+                },
+                aiAnalysis,
+                screenshotUrl,
+            };
+
+            // 9. Save State and Push Result
+            await stateManager.save(url, normalizedHtml);
+            await Actor.pushData({
+                ...result,
+                '#debug': {
+                    requestId: Actor.getEnv().actorRunId,
+                    isDuplicate,
+                    meetsThreshold,
+                    preset: input.preset,
+                },
+            });
+
+            // 10. Notifications (Filter by Noise Threshold)
+            if (!isDuplicate && meetsThreshold) {
+                log.info(`🔔 Severity ${severityScore} exceeds threshold ${input.minSeverityToAlert}. Sending alerts...`);
+
+                // 10a. Slack
+                if (input.slackWebhookUrl) {
+                    const slack = new SlackNotifier(input.slackWebhookUrl);
+                    await slack.send(result);
+                }
+
+                // 10b. Generic Webhook
+                if (input.notificationConfig?.webhookUrl) {
                     try {
                         await gotScraping.post(input.notificationConfig.webhookUrl, {
                             json: result,
-                            headers: input.notificationConfig.authHeader ? {
-                                'Authorization': input.notificationConfig.authHeader
-                            } : {},
-                            timeout: { request: 10000 },
+                            headers: input.notificationConfig.authHeader ? { 'Authorization': input.notificationConfig.authHeader } : {},
                         });
-                        log.info('✅ Webhook delivered successfully.');
-                        success = true;
-                    } catch (webhookError) {
-                        attempt++;
-                        const err = webhookError as Error;
-
-                        if (attempt < maxRetries) {
-                            const backoffMs = Math.pow(2, attempt) * 1000; // Exponential backoff: 2s, 4s, 8s
-                            log.warning(`❌ Webhook delivery failed (attempt ${attempt}/${maxRetries}): ${err.message}. Retrying in ${backoffMs / 1000}s...`);
-                            await new Promise(resolve => setTimeout(resolve, backoffMs));
-                        } else {
-                            log.error(`❌ Webhook delivery failed after ${maxRetries} attempts: ${err.message}`);
-                        }
+                    } catch (e) {
+                        log.error(`❌ Webhook failed for ${url}: ${(e as Error).message}`);
                     }
                 }
+            } else if (!meetsThreshold) {
+                log.info(`🔇 Skipping alerts for ${url}: Severity ${severityScore} is below threshold ${input.minSeverityToAlert}`);
             }
-        }
 
-        await Actor.exit();
+        } catch (urlError) {
+            log.error(`❌ Error processing ${url}: ${(urlError as Error).message}`);
+        }
     }
+
+    await Actor.exit();
+
 } catch (error) {
     const err = error as Error;
-    log.error(`💥 Actor failed with error: ${err.message}`);
-
-    await Actor.pushData({
-        error: true,
-        message: err.message,
-        timestamp: new Date().toISOString(),
-    });
-
+    log.error(`💥 Fatal error: ${err.message}`);
     await Actor.fail(err.message);
 }
-

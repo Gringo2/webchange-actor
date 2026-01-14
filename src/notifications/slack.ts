@@ -58,7 +58,14 @@ export class SlackNotifier {
                 type: 'section',
                 text: {
                     type: 'mrkdwn',
-                    text: `*Summary:*\n${result.aiAnalysis?.summary || result.diffSummary.text.substring(0, 500)}`,
+                    text: `*Summary:*\n${result.aiAnalysis?.summary || this.formatFallbackSummary(result)}`,
+                },
+            },
+            {
+                type: 'section',
+                text: {
+                    type: 'mrkdwn',
+                    text: `*Raw Changes (Technical):*\n${this.formatRawChanges(result)}`,
                 },
             },
             {
@@ -94,6 +101,41 @@ export class SlackNotifier {
         } catch {
             return url;
         }
+    }
+
+    private formatRawChanges(result: AnalysisResult): string {
+        const technicalDiffs = result.diffSummary.structured.slice(0, 5);
+        if (technicalDiffs.length === 0) return '_No structured diff available_';
+
+        const lines = technicalDiffs.map(d => {
+            const label = d.type.toUpperCase();
+            const selectorStr = `\`${d.selector}\``;
+            if (d.type === 'modified') {
+                return `• *${label}*: ${selectorStr} (\`${d.old}\` → \`${d.new}\`)`;
+            }
+            return `• *${label}*: ${selectorStr} (\`${d.new || d.old}\`)`;
+        });
+
+        if (result.diffSummary.structured.length > 5) {
+            lines.push(`_...and ${result.diffSummary.structured.length - 5} more changes (see Dataset for full list)_`);
+        }
+
+        return lines.join('\n');
+    }
+
+    private formatFallbackSummary(result: AnalysisResult): string {
+        const significantChanges = result.diffSummary.structured
+            .filter(d => d.type !== 'added' || !['h1', 'h2', 'h3'].includes(d.selector)) // Ignore added headers if they are just context
+            .slice(0, 3);
+
+        if (significantChanges.length === 0) return result.diffSummary.text.substring(0, 500);
+
+        return significantChanges.map(d => {
+            const contextPrefix = d.context ? `*[${d.context}]* ` : '';
+            if (d.type === 'modified') return `${contextPrefix}${d.selector} changed from ${d.old} to ${d.new}`;
+            if (d.type === 'added') return `${contextPrefix}New content added to ${d.selector}: ${d.new}`;
+            return `${contextPrefix}${d.selector} removed: ${d.old}`;
+        }).join('\n');
     }
 
     private isPriceDecrease(result: AnalysisResult): boolean {

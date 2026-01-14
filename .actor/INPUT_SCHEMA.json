@@ -5,97 +5,111 @@
     "schemaVersion": 1,
     "properties": {
         "targetUrl": {
-            "title": "Target URL",
-            "type": "string",
-            "description": "The URL of the page you want to monitor.",
-            "editor": "textfield",
-            "prefill": "https://example.com"
+            "title": "Target URL(s)",
+            "type": "array",
+            "description": "The URL(s) of the page(s) you want to monitor.",
+            "editor": "stringList",
+            "prefill": [
+                "https://example.com"
+            ]
         },
         "preset": {
             "title": "Preset Strategy",
             "type": "string",
             "description": "Select a monitoring strategy tailored for specific use cases.",
             "editor": "select",
-            "default": "generic",
+            "default": "competitor-pricing",
             "enum": [
-                "pricing",
-                "policy",
-                "competitor",
+                "competitor-pricing",
+                "inventory-tracker",
+                "seo-intelligence",
                 "generic"
             ],
             "enumTitles": [
-                "Pricing Monitor",
-                "Policy/Legal Monitor",
-                "Competitor Analysis",
-                "Generic Monitor"
+                "Competitor Pricing (Price drops, discounts)",
+                "Inventory Tracker (In-stock, Out-of-stock)",
+                "SEO Intelligence (Title, Meta, H1)",
+                "Generic Monitor (Custom rules)"
             ]
         },
         "cssSelector": {
             "title": "CSS Selector",
             "type": "string",
-            "description": "Restrict monitoring to specific parts of the page (e.g., '.product-details'). Leave empty for whole page.",
+            "description": "Restrict monitoring to specific parts of the page. Leave empty for whole page.",
             "editor": "textfield"
+        },
+        "useVisualProof": {
+            "title": "Enable Visual Proof",
+            "type": "boolean",
+            "description": "Capture context-aware screenshots with change highlighting.",
+            "default": false
+        },
+        "minSeverityToAlert": {
+            "title": "Min Severity Threshold",
+            "type": "integer",
+            "description": "Filter noise: Only alert if change score is above this value (0-100).",
+            "default": 40,
+            "minimum": 0,
+            "maximum": 100
         },
         "useAi": {
             "title": "Use AI Analysis",
             "type": "boolean",
-            "description": "Enable AI to interpret and summarize changes (requires API Key).",
+            "description": "Enable AI to interpret and summarize changes (recommended for business users).",
             "default": false
         },
         "aiOptions": {
-            "title": "AI Configuration",
+            "title": "🤖 AI Configuration",
             "type": "object",
-            "description": "Settings for the AI Interpreter.",
+            "sectionCaption": "AI Settings",
             "properties": {
                 "apiKey": {
                     "title": "OpenAI API Key",
                     "type": "string",
-                    "description": "Your OpenAI API key.",
+                    "description": "Required if AI Analysis is enabled.",
                     "editor": "textfield",
                     "isSecret": true
                 },
                 "model": {
                     "title": "AI Model",
                     "type": "string",
-                    "description": "LLM model to use (default: gpt-4-turbo-preview).",
+                    "description": "LLM model (default: gpt-4-turbo-preview).",
                     "editor": "textfield",
                     "default": "gpt-4-turbo-preview"
                 }
             }
         },
+        "slackWebhookUrl": {
+            "title": "Slack Webhook URL",
+            "type": "string",
+            "description": "Send rich, color-coded alerts directly to your Slack channel.",
+            "editor": "textfield",
+            "sectionCaption": "Notifications"
+        },
         "notificationConfig": {
-            "title": "Notification Settings",
+            "title": "Custom Webhook",
             "type": "object",
-            "description": "Configure alerts for detected changes.",
             "properties": {
                 "webhookUrl": {
-                    "title": "Webhook URL",
+                    "title": "Generic Webhook URL",
                     "type": "string",
-                    "description": "URL to send a POST request to when a significant change is detected.",
-                    "editor": "textfield"
-                },
-                "authHeader": {
-                    "title": "Authorization Header",
-                    "type": "string",
-                    "description": "Optional Authorization header value for the webhook.",
+                    "description": "URL for custom integration (POST JSON).",
                     "editor": "textfield"
                 }
             }
         },
+        "proxyConfiguration": {
+            "title": "Proxy Configuration",
+            "type": "object",
+            "description": "Recommended for high-frequency or multi-target monitoring.",
+            "editor": "proxy"
+        },
         "historyDepth": {
             "title": "History Depth",
             "type": "integer",
-            "description": "Number of historical snapshots to retain (1-20).",
+            "description": "Number of historical snapshots to retain (prevents drift).",
             "default": 5,
-            "minimum": 1,
-            "maximum": 20
-        },
-        "cooldownPeriodMinutes": {
-            "title": "Cooldown Period (minutes)",
-            "type": "integer",
-            "description": "Duplicate suppression window in minutes.",
-            "default": 60,
-            "minimum": 0
+            "sectionCaption": "Advanced Persistence"
         }
     },
     "required": [

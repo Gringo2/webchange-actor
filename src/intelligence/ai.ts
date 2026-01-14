@@ -23,6 +23,7 @@ export class AIInterpreter {
 
         const sampledDiffs = diffs.slice(0, 10).map(d => ({
             selector: d.selector,
+            context: d.context,
             type: d.type,
             old: d.old?.substring(0, 100),
             new: d.new?.substring(0, 100),
@@ -33,11 +34,11 @@ export class AIInterpreter {
             Target Preset: ${preset.id}
             Context: ${preset.aiPrompt || 'General monitoring'}
             
-            Diff Data:
+            Diff Data (includes context labels if found):
             ${JSON.stringify(sampledDiffs, null, 2)}
             
             Task:
-            1. Summarize the changes in one sentence.
+            1. Summarize the changes in one sentence. Use the "context" field to identify specifically which product or section changed.
             2. Provide the reasoning/importance of these changes.
             
             Return ONLY a JSON object: { "summary": "...", "reasoning": "..." }

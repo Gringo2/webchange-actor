@@ -4,10 +4,11 @@ import { z } from 'zod';
  * Actor Input Schema
  */
 export const InputSchema = z.object({
-    targetUrl: z.string().url(),
+    targetUrl: z.union([z.string().url(), z.array(z.string().url())]),
     preset: z.enum(['competitor-pricing', 'inventory-tracker', 'seo-intelligence', 'generic']).default('competitor-pricing'),
     cssSelector: z.string().optional(),
     useVisualProof: z.boolean().default(false),
+    minSeverityToAlert: z.number().int().min(0).max(100).default(40),
     useAi: z.boolean().default(false),
     aiOptions: z.object({
         provider: z.enum(['openai', 'anthropic']).default('openai'),
@@ -28,14 +29,13 @@ export const InputSchema = z.object({
 export type ActorInput = z.infer<typeof InputSchema>;
 
 /**
- * Internal Preset Configuration
+ * Preset configuration
  */
 export interface PresetConfig {
     id: string;
     rules: {
         includeSelectors: string[];
         excludeSelectors: string[];
-        keywords: string[];
     };
     aiPrompt?: string;
 }
@@ -46,20 +46,21 @@ export interface PresetConfig {
 export interface DiffItem {
     path: string;
     selector: string;
+    context?: string; // Semantic context (text)
+    contextPath?: string; // DOM path of the context identifier
     old: string | null;
     new: string | null;
     type: 'added' | 'removed' | 'modified';
 }
 
 /**
- * Final Analysis Result
+ * Final Analysis Result for Output/Notifications
  */
 export interface AnalysisResult {
     url: string;
     timestamp: string;
-    changeDetected: boolean;
+    changeType: 'major' | 'minor' | 'none';
     severityScore: number;
-    changeType: 'content_added' | 'content_removed' | 'content_modified' | 'structure_change' | 'no_change';
     diffSummary: {
         text: string;
         structured: DiffItem[];
@@ -68,12 +69,5 @@ export interface AnalysisResult {
         summary: string;
         reasoning: string;
     };
-    visualProofUrl?: string;
-    v2?: {
-        isDuplicate: boolean;
-        deduplicationHash: string;
-        historyDepth: number;
-        relatedSnapshots: string[];
-        reasons: string[];
-    };
+    screenshotUrl?: string;
 }

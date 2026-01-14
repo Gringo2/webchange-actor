@@ -123,9 +123,10 @@
     <section>
         <h2>The Core Pipeline</h2>
         <div class="card">
-            <h3>1. Input & Fetching</h3>
-            <p>Every run begins with Zod-validated input. The <code>CheerioFetcher</code> initiates a proxy-aware HTTP
-                request to the target URL. Cheerio is used first to minimize compute cost and maximize speed.</p>
+            <h3>1. Input & Batch Sequencing</h3>
+            <p>SWIM V1.2 introduces a <strong>High-Scale Batch Loop</strong>. The actor validates the list of target
+                URLs and processes each in sequence, maintaining isolated state stores for every target while sharing
+                global proxy resources.</p>
         </div>
 
         <div class="card">

@@ -108,11 +108,10 @@
     <section>
         <div class="faq-item">
             <h3>❓ I'm getting "Change Detected" but the page looks the same.</h3>
-            <p>This is usually due to <strong>Invisible HTML shifts</strong> (e.g., hidden SEO meta tags or dynamic
-                script IDs). While the <code>Preprocessor</code> removes 99% of this, some sites use custom attributes.
-            </p>
-            <p><strong>Solution:</strong> Check the <code>#debug</code> metadata in your dataset. It will show you
-                exactly which hidden tags changed.</p>
+            <p><strong>Solution A:</strong> Check the <code>#debug</code> metadata. It will show you exactly which
+                hidden tags changed.</p>
+            <p><strong>Solution B:</strong> Increase your <code>minSeverityToAlert</code> threshold (e.g., to 60). This
+                "Noise Guard" filters out low-impact technical shifts.</p>
         </div>
 
         <div class="faq-item">
@@ -127,8 +126,16 @@
             <h3>❓ Visual Proof screenshots are showing the wrong area.</h3>
             <p>SWIM tries to guess the best area to screenshot based on your preset, but sometimes layouts are too
                 complex.</p>
-            <p><strong>Solution:</strong> Provide a custom <code>cssSelector</code> in the input. SWIM will precisely
-                target that element for its Visual Proof.</p>
+            <p><strong>Solution:</strong> Provide a custom <code>cssSelector</code>. SWIM will also try to use the
+                <code>contextPath</code> (e.g., the nearest heading) to draw a blue identification box automatically.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>❓ Can I monitor dozens of URLs without hitting limits?</h3>
+            <p>Yes. SWIM V1.2 uses a sequential batch loop designed for high-scale monitoring.</p>
+            <p><strong>Solution:</strong> Input a list of URLs in the <code>targetUrl</code> field. The actor will
+                process them one-by-one, sharing proxy resources while keeping data isolated.</p>
         </div>
 
         <h2>Common Error Codes</h2>

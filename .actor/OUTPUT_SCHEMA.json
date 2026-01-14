@@ -54,6 +54,14 @@
                                 "type": "string",
                                 "description": "CSS selector"
                             },
+                            "context": {
+                                "type": "string",
+                                "description": "Semantic context (e.g. product name)"
+                            },
+                            "contextPath": {
+                                "type": "string",
+                                "description": "Path to the context identifier element"
+                            },
                             "old": {
                                 "type": [
                                     "string",
@@ -104,6 +112,10 @@
                     "description": "AI's reasoning for the analysis"
                 }
             }
+        },
+        "screenshotUrl": {
+            "type": "string",
+            "description": "URL to the visual proof screenshot (if enabled)"
         },
         "v2": {
             "type": "object",

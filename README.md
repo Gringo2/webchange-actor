@@ -1,4 +1,4 @@
-# <img src="./docs/assets/logo.svg" width="60" height="60" align="center" /> SWIM: Competitor Pricing Change Monitor (V1.1)
+# <img src="./docs/assets/logo.svg" width="60" height="60" align="center" /> SWIM: Competitor Pricing Change Monitor (V1.2 Elite)
 
 **Don't just detect changes. Understand them.**
 
@@ -6,12 +6,13 @@ SWIM (Semantic Web Intelligent Monitor) is a production-grade Apify Actor design
 
 ---
 
-## 💎 Key Features (V1.1)
+## 💎 Key Features (V1.2 Elite)
 
--   **LCS Diff Engine**: Industry-leading stability that handles prepended list items and shifting layouts without false alerts.
--   **Native Slack Integration**: Rich, color-coded alerts with intelligent price-drop detection.
--   **Visual Proof**: Context-aware screenshots that highlight exactly what changed in glowing red.
--   **AI Intelligence**: (Optional) Human-readable summaries explaining the business impact of a change.
+-   **Batch Monitoring**: High-scale loop that monitors multiple competitor URLs in a single run.
+-   **LCS Diff Engine**: Structural diff stability that handles list insertions and shifting layouts without false alerts.
+-   **Noise Guard**: Severity-based filtering (`minSeverityToAlert`) to suppress insignificant 1-cent changes.
+-   **Visual Proof**: Context-aware screenshots that highlight both the change (Red) and the product identifier (Blue).
+-   **AI Intelligence**: (Optional) LLM-powered interpretation of changes with semantic product attribution.
 -   **Auto-Persistence**: Named Key-Value Stores preserve state safely across scheduled cron runs.
 
 ---
@@ -34,18 +35,18 @@ For deep technical details, operational strategies, and setup guides, visit the 
 ## 🚀 Quick Start
 
 1.  **Create an Apify Task** based on the SWIM Actor.
-2.  **Set `targetUrl`** to the product or page you want to monitor.
+2.  **Set `targetUrl`** to the product or page you want to monitor (supports List/Array).
 3.  **Configure `slackWebhookUrl`** to receive instant alerts.
 4.  **(Optional)** Enable `useVisualProof` for visual confirmation of changes.
 
-### Minimal Input Example:
+### Minimal Batch Example:
 ```json
 {
-    "targetUrl": "https://example.com/product/123",
+    "targetUrl": ["https://site1.com/p1", "https://site2.com/p2"],
     "preset": "competitor-pricing",
     "slackWebhookUrl": "https://hooks.slack.com/services/...",
-    "useVisualProof": true,
-    "proxyConfiguration": { "useApifyProxy": true }
+    "minSeverityToAlert": 50,
+    "useVisualProof": true
 }
 ```
 
@@ -59,13 +60,14 @@ SWIM pushes a structured JSON analysis to the Apify Dataset:
   "url": "https://example.com/product",
   "changeDetected": true,
   "severityScore": 85,
-  "classification": "price_drop",
-  "summary": "AI Summary: Price dropped from $99 to $79.",
-  "visualProofUrl": "https://api.apify.com/v2/key-value-stores/...",
-  "diff": [
-    { "type": "removed", "content": "$99.00", "selector": ".price" },
-    { "type": "added", "content": "$79.00", "selector": ".price" }
-  ]
+  "summary": "AI Summary: Price for iPhone 15 dropped from $999 to $949.",
+  "screenshotUrl": "https://api.apify.com/v2/key-value-stores/...",
+  "diffSummary": {
+      "text": "...",
+      "structured": [
+        { "type": "modified", "old": "$999", "new": "$949", "selector": ".price", "context": "iPhone 15" }
+      ]
+  }
 }
 ```
 

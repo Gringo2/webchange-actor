@@ -130,17 +130,21 @@
     <section>
         <h2>Monitoring Multiple Competitors</h2>
         <div class="strategy-card">
-            <h3>The One-Task-Per-Competitor Model</h3>
-            <p>SWIM is designed as a focused monitoring agent. To track 10 different competitors, you should create
-                <strong>10 Apify Tasks</strong> based on the SWIM actor.
-            </p>
+            <h3>The Direct Batch Model (Recommended)</h3>
+            <p>SWIM now supports monitoring multiple competitors in a single run. Simply provide a list of URLs in the
+                <code>targetUrl</code> field.</p>
             <ul>
-                <li><strong>Isolation:</strong> If one site's layout changes, it doesn't affect the monitoring of
-                    others.</li>
-                <li><strong>Parallelism:</strong> Multiple runs can happen simultaneously without bottlenecking.</li>
-                <li><strong>Independent Settings:</strong> Set individual proxies, Slack channels, or AI options for
-                    each competitor.</li>
+                <li><strong>Efficiency:</strong> Lower resource overhead by processing all targets in one session.</li>
+                <li><strong>Consolidated Alerts:</strong> Get summaries for all competitors in a single batch flow.</li>
+                <li><strong>Severity Filtering:</strong> Use <code>minSeverityToAlert</code> to ignore minor shifts
+                    across the entire fleet.</li>
             </ul>
+        </div>
+
+        <div class="strategy-card">
+            <h3>Individual Task Isolation</h3>
+            <p>For high-priority competitors requiring unique settings (different Slack channels or AI models), use
+                individual Apify Tasks.</p>
         </div>
 
         <h2>Scheduling & Persistence</h2>
