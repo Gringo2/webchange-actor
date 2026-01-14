@@ -1,0 +1,11 @@
+{
+    "targetUrl": "https://example.com/pricing",
+    "preset": "pricing",
+    "cssSelector": ".pricing-table",
+    "useAi": false,
+    "historyDepth": 5,
+    "cooldownPeriodMinutes": 60,
+    "notificationConfig": {
+        "webhookUrl": "https://hooks.example.com/webhook"
+    }
+}

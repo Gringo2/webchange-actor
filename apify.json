@@ -15,6 +15,9 @@
             "actorSpecification": 1
         }
     },
+    "actor": {
+        "image": "./assets/swim-logo.svg"
+    },
     "env": {
         "npm_config_loglevel": "warn"
     }

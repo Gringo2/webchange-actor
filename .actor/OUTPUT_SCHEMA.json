@@ -1,0 +1,151 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "SWIM Analysis Result",
+    "type": "object",
+    "description": "Output from SWIM Actor containing change detection results",
+    "properties": {
+        "url": {
+            "type": "string",
+            "description": "The monitored URL"
+        },
+        "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of the analysis"
+        },
+        "changeDetected": {
+            "type": "boolean",
+            "description": "Whether a change was detected"
+        },
+        "severityScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Impact score (0-100)"
+        },
+        "changeType": {
+            "type": "string",
+            "enum": [
+                "content_added",
+                "content_removed",
+                "content_modified",
+                "structure_change",
+                "no_change"
+            ],
+            "description": "Classification of the detected change"
+        },
+        "diffSummary": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "Plain text summary of changes"
+                },
+                "structured": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "type": "string",
+                                "description": "DOM path to changed element"
+                            },
+                            "selector": {
+                                "type": "string",
+                                "description": "CSS selector"
+                            },
+                            "old": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "Previous value"
+                            },
+                            "new": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "New value"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "added",
+                                    "removed",
+                                    "modified"
+                                ],
+                                "description": "Type of change"
+                            }
+                        },
+                        "required": [
+                            "path",
+                            "selector",
+                            "type"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "text",
+                "structured"
+            ]
+        },
+        "aiAnalysis": {
+            "type": "object",
+            "description": "AI-generated analysis (when useAi is enabled)",
+            "properties": {
+                "summary": {
+                    "type": "string",
+                    "description": "Human-readable summary"
+                },
+                "reasoning": {
+                    "type": "string",
+                    "description": "AI's reasoning for the analysis"
+                }
+            }
+        },
+        "v2": {
+            "type": "object",
+            "description": "V2 metadata (deduplication, history, explainability)",
+            "properties": {
+                "isDuplicate": {
+                    "type": "boolean",
+                    "description": "Whether this is a duplicate event"
+                },
+                "deduplicationHash": {
+                    "type": "string",
+                    "description": "SHA-256 hash for duplicate detection"
+                },
+                "historyDepth": {
+                    "type": "integer",
+                    "description": "Number of historical snapshots retained"
+                },
+                "relatedSnapshots": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "description": "Timestamps of related historical snapshots"
+                },
+                "reasons": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Explainability - why this change was flagged"
+                }
+            }
+        },
+        "message": {
+            "type": "string",
+            "description": "Status message (e.g., 'Initial snapshot created')"
+        }
+    },
+    "required": [
+        "url",
+        "timestamp",
+        "changeDetected"
+    ]
+}

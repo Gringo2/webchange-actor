@@ -122,6 +122,29 @@ npm test
 
 ---
 
+## 💰 Resource Requirements
+
+**Memory:**
+- Minimum: 512 MB
+- Recommended: 1024 MB (for AI mode)
+- With large pages (>5MB HTML): 2048 MB
+
+**Runtime:**
+- Simple page: 5-10 seconds
+- Average page: 10-20 seconds
+- Complex page with AI: 20-30 seconds
+
+**Cost Estimate:**
+- Without AI: ~$0.01 per 100 runs
+- With AI (GPT-4): ~$0.05 per run (OpenAI API cost additional)
+
+**Recommended Schedule:**
+- Price monitoring: Every 6-12 hours
+- Policy monitoring: Daily
+- Competitor analysis: Every 24 hours
+
+---
+
 ## 🏗️ Architecture
 
 - **Fetcher**: HTTP-based (Cheerio) for speed and determinism.
