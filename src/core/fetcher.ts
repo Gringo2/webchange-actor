@@ -7,8 +7,8 @@ export interface IFetcher {
 }
 
 export class CheerioFetcher implements IFetcher {
-    async fetch(url: string, cssSelector?: string): Promise<{ html: string; $: cheerio.CheerioAPI }> {
-        const proxyConfiguration = await Actor.createProxyConfiguration();
+    async fetch(url: string, cssSelector?: string, proxyConfigOptions?: any): Promise<{ html: string; $: cheerio.CheerioAPI }> {
+        const proxyConfiguration = await Actor.createProxyConfiguration(proxyConfigOptions);
 
         const proxyUrl = await proxyConfiguration?.newUrl();
 

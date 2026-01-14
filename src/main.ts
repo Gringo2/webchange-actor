@@ -1,5 +1,7 @@
 import { Actor, log } from 'apify';
 import { CheerioFetcher } from './core/fetcher.js';
+import { SlackNotifier } from './notifications/slack.js';
+import { VisualProofer } from './core/visual-proofer.js';
 import { Preprocessor } from './core/preprocessor.js';
 import { DiffEngine } from './core/diff.js';
 import { SemanticClassifier } from './core/classifier.js';
@@ -28,7 +30,7 @@ try {
     const historyStore = new HistoryStore();
     const deduplicator = new Deduplicator();
 
-    const { html: rawHtml } = await fetcher.fetch(input.targetUrl, input.cssSelector);
+    const { html: rawHtml } = await fetcher.fetch(input.targetUrl, input.cssSelector, input.proxyConfiguration);
     const normalizedHtml = Preprocessor.normalize(rawHtml, {
         excludeSelectors: preset.rules.excludeSelectors,
     });
@@ -83,6 +85,22 @@ try {
         }
         const history = await historyStore.getHistory(input.targetUrl);
 
+        // 6b. Conditional Visual Proof
+        let visualProofUrl: string | undefined;
+        if (!isDuplicate && diffs.length > 0 && input.useVisualProof) {
+            // Priority: 1. User specified selector, 2. First matching preset include selector, 3. Undefined (Full page)
+            let snapshotSelector = input.cssSelector;
+            if (!snapshotSelector && preset.rules.includeSelectors.length > 0) {
+                // Heuristic: Use the first selector from the preset that actually appeared in the diffs
+                const firstMatchingDiff = diffs.find(d =>
+                    preset.rules.includeSelectors.some(s => d.selector.includes(s))
+                );
+                snapshotSelector = firstMatchingDiff?.selector || preset.rules.includeSelectors[0];
+            }
+
+            visualProofUrl = await VisualProofer.capture(input.targetUrl, snapshotSelector) || undefined;
+        }
+
         // 7. Format Output
         const result: AnalysisResult = {
             url: input.targetUrl,
@@ -95,6 +113,7 @@ try {
                 structured: diffs,
             },
             aiAnalysis,
+            visualProofUrl,
             v2: {
                 isDuplicate,
                 deduplicationHash: eventHash,
@@ -110,37 +129,55 @@ try {
             await stateManager.save(input.targetUrl, normalizedHtml);
         }
 
-        await Actor.pushData(result);
+        await Actor.pushData({
+            ...result,
+            '#debug': {
+                requestId: Actor.getEnv().actorRunId,
+                preset: input.preset,
+                useAi: input.useAi,
+                useVisualProof: input.useVisualProof,
+            },
+        });
 
-        // 9. Webhook Notification with Retry Logic
-        if (!isDuplicate && input.notificationConfig?.webhookUrl && result.changeDetected && severityScore >= 50) {
-            log.info(`📧 Sending webhook notification to: ${input.notificationConfig.webhookUrl}`);
+        // 9. Notifications
+        if (!isDuplicate && result.changeDetected && severityScore >= 50) {
+            // 9a. Slack Notification (Rich)
+            if (input.slackWebhookUrl) {
+                log.info(`💬 Sending rich Slack notification to: ${input.slackWebhookUrl}`);
+                const slack = new SlackNotifier(input.slackWebhookUrl);
+                await slack.send(result);
+            }
 
-            const maxRetries = 3;
-            let attempt = 0;
-            let success = false;
+            // 9b. Generic Webhook Notification
+            if (input.notificationConfig?.webhookUrl) {
+                log.info(`📧 Sending webhook notification to: ${input.notificationConfig.webhookUrl}`);
 
-            while (attempt < maxRetries && !success) {
-                try {
-                    await gotScraping.post(input.notificationConfig.webhookUrl, {
-                        json: result,
-                        headers: input.notificationConfig.authHeader ? {
-                            'Authorization': input.notificationConfig.authHeader
-                        } : {},
-                        timeout: { request: 10000 },
-                    });
-                    log.info('✅ Webhook delivered successfully.');
-                    success = true;
-                } catch (webhookError) {
-                    attempt++;
-                    const err = webhookError as Error;
+                const maxRetries = 3;
+                let attempt = 0;
+                let success = false;
 
-                    if (attempt < maxRetries) {
-                        const backoffMs = Math.pow(2, attempt) * 1000; // Exponential backoff: 2s, 4s, 8s
-                        log.warning(`❌ Webhook delivery failed (attempt ${attempt}/${maxRetries}): ${err.message}. Retrying in ${backoffMs / 1000}s...`);
-                        await new Promise(resolve => setTimeout(resolve, backoffMs));
-                    } else {
-                        log.error(`❌ Webhook delivery failed after ${maxRetries} attempts: ${err.message}`);
+                while (attempt < maxRetries && !success) {
+                    try {
+                        await gotScraping.post(input.notificationConfig.webhookUrl, {
+                            json: result,
+                            headers: input.notificationConfig.authHeader ? {
+                                'Authorization': input.notificationConfig.authHeader
+                            } : {},
+                            timeout: { request: 10000 },
+                        });
+                        log.info('✅ Webhook delivered successfully.');
+                        success = true;
+                    } catch (webhookError) {
+                        attempt++;
+                        const err = webhookError as Error;
+
+                        if (attempt < maxRetries) {
+                            const backoffMs = Math.pow(2, attempt) * 1000; // Exponential backoff: 2s, 4s, 8s
+                            log.warning(`❌ Webhook delivery failed (attempt ${attempt}/${maxRetries}): ${err.message}. Retrying in ${backoffMs / 1000}s...`);
+                            await new Promise(resolve => setTimeout(resolve, backoffMs));
+                        } else {
+                            log.error(`❌ Webhook delivery failed after ${maxRetries} attempts: ${err.message}`);
+                        }
                     }
                 }
             }

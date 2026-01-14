@@ -7,6 +7,7 @@ export const InputSchema = z.object({
     targetUrl: z.string().url(),
     preset: z.enum(['competitor-pricing', 'inventory-tracker', 'seo-intelligence', 'generic']).default('competitor-pricing'),
     cssSelector: z.string().optional(),
+    useVisualProof: z.boolean().default(false),
     useAi: z.boolean().default(false),
     aiOptions: z.object({
         provider: z.enum(['openai', 'anthropic']).default('openai'),
@@ -17,6 +18,8 @@ export const InputSchema = z.object({
         webhookUrl: z.string().url(),
         authHeader: z.string().optional(),
     }).optional(),
+    proxyConfiguration: z.object({}).passthrough().optional(),
+    slackWebhookUrl: z.string().url().optional(),
     // V2 specific
     historyDepth: z.number().int().min(1).max(20).default(5),
     cooldownPeriodMinutes: z.number().int().min(0).default(60),
@@ -65,6 +68,7 @@ export interface AnalysisResult {
         summary: string;
         reasoning: string;
     };
+    visualProofUrl?: string;
     v2?: {
         isDuplicate: boolean;
         deduplicationHash: string;

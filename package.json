@@ -5,7 +5,9 @@
     "main": "dist/main.js",
     "type": "module",
     "scripts": {
-        "start": "node dist/main.js",
+        "start": "npm run start:dev",
+        "start:dev": "tsx src/main.ts",
+        "start:prod": "node dist/main.js",
         "build": "tsc",
         "test": "node --loader ts-node/esm src/verify-v1.ts",
         "lint": "eslint src/**/*.ts",
@@ -26,6 +28,7 @@
         "dotenv": "^16.3.1",
         "got-scraping": "^4.0.0",
         "openai": "^4.20.1",
+        "puppeteer": "^24.35.0",
         "zod": "^3.22.4"
     },
     "devDependencies": {
@@ -34,6 +37,7 @@
         "eslint": "^8.57.1",
         "prettier": "^3.7.4",
         "ts-node": "^10.9.2",
+        "tsx": "^4.21.0",
         "typescript": "^5.9.3"
     }
 }

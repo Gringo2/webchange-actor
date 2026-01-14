@@ -21,7 +21,7 @@ export class Deduplicator {
      * Checks if an event is a duplicate within the cooldown window.
      */
     async isDuplicate(eventHash: string, cooldownHours: number = 24): Promise<boolean> {
-        const store = await Actor.openKeyValueStore();
+        const store = await Actor.openKeyValueStore('SWIM-DEDUPE');
         const key = `dedupe_${eventHash}`;
 
         const lastSeen = await store.getValue(key) as string;
@@ -42,7 +42,7 @@ export class Deduplicator {
      * Records an event to the deduplication store.
      */
     async recordEvent(eventHash: string): Promise<void> {
-        const store = await Actor.openKeyValueStore();
+        const store = await Actor.openKeyValueStore('SWIM-DEDUPE');
         const key = `dedupe_${eventHash}`;
         await store.setValue(key, new Date().toISOString());
     }

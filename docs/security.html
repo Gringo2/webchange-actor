@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIM - Security & Compliance</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fafafa;
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #28a745;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 40px;
+        }
+
+        .security-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 6px solid #28a745;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .security-card h3 {
+            margin-top: 0;
+            color: #28a745;
+        }
+
+        nav {
+            background: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: #28a745;
+        }
+
+        nav a.active {
+            color: #28a745;
+            font-weight: bold;
+            border-bottom: 2px solid #28a745;
+        }
+
+        footer {
+            margin-top: 60px;
+            font-size: 0.9em;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="setup.html">Setup</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="system-design.html">Design</a>
+        <a href="features.html">Features</a>
+        <a href="use-cases.html">Use Cases</a>
+        <a href="operations.html">Operations</a>
+        <a href="developer.html">Developer</a>
+        <a href="security.html" class="active">Security</a>
+        <a href="troubleshooting.html">FAQ</a>
+    </nav>
+    <header>
+        <h1>Security & Trust</h1>
+        <p>How SWIM handles sensitive data, API keys, and secure web access.</p>
+    </header>
+
+    <section>
+        <h2>Data Privacy & Handling</h2>
+        <div class="security-card">
+            <h3>BYOK (Bring Your Own Key) Model</h3>
+            <p>SWIM does not charge for AI usage. Instead, it uses a <strong>BYOK model</strong> for OpenAI and
+                Anthropic integrations.</p>
+            <ul>
+                <li><strong>Transparency:</strong> You know exactly what you are paying for AI.</li>
+                <li><strong>Control:</strong> Your API keys are never stored by SWIM; they are passed directly to the
+                    provider.</li>
+                <li><strong>Isolation:</strong> Each user uses their own limits and billing.</li>
+            </ul>
+        </div>
+
+        <div class="security-card">
+            <h3>Secrets Management</h3>
+            <p>All sensitive inputs (Slack Webhooks, AI Keys) should be managed via <strong>Apify Secret
+                    Inputs</strong>.</p>
+            <ul>
+                <li>These values are encrypted at rest by Apify.</li>
+                <li>They are only decrypted inside the Actor's sandbox during runtime.</li>
+                <li>They are never logged to the console by the SWIM core.</li>
+            </ul>
+        </div>
+
+        <h2>Network Security</h2>
+        <div class="security-card">
+            <h3>Encrypted Proxy Traffic</h3>
+            <p>When using <code>proxyConfiguration</code>, all traffic between SWIM and the Apify Proxy is encrypted.
+                This prevents local network snooping on your target URLs and data.</p>
+        </div>
+
+        <div class="security-card">
+            <h3>Sandboxed Execution</h3>
+            <p>SWIM runs inside a multi-stage Docker container (Node 22) on Apify's secure infrastructure. Each run is
+                ephemeral and isolated from other users.</p>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 SWIM Project - Security & Trust Module.
+    </footer>
+</body>
+
+</html>

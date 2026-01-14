@@ -1,106 +1,78 @@
-# <img src="./assets/swim-logo.svg" width="60" height="60" align="center" /> Competitor Pricing Change Monitor (AI-powered)
+# <img src="./docs/assets/logo.svg" width="60" height="60" align="center" /> SWIM: Competitor Pricing Change Monitor (V1.1)
 
-**We don’t tell you that a page changed. We tell you *what* changed and *why* it matters.**
+**Don't just detect changes. Understand them.**
 
-This actor is a precision tool for monitoring pricing, inventory, and SEO changes. It uses semantic analysis to ignore ads, popups, and layout shifts, focusing only on the data that affects your revenue.
-
----
-
-## 🌟 Why This Actor?
-
--   **Zero Noise**: Ignores ads, timestamps, and random HTML changes.
--   **Smart Defaults**: Pre-configured for pricing and inventory tracking right out of the box.
--   **No Alert Fatigue**: Deduplication ensures you never get bombarded for the same event twice.
--   **AI Explanation**: (Optional) Uses GPT-4 to tell you *why* a change matters (e.g., "Price increased by 20%", "Product is now Sold Out").
+SWIM (Semantic Web Intelligent Monitor) is a production-grade Apify Actor designed for high-accuracy tracking of pricing, inventory, and SEO shifts. Unlike standard scrapers, SWIM uses a structural diff engine (LCS) to ignore noise and focus on revenue-impacting data.
 
 ---
 
-## 🚀 Use Cases
+## 💎 Key Features (V1.1)
 
-### 1. Competitor Pricing (Default)
-Track your competitors' product pages. Get notified instantly when they:
--   Lower their price.
--   Run a new discount or sale.
--   Change their subscription tiers.
-
-### 2. Inventory Tracking
-Stop losing revenue to stockouts. Monitor key suppliers or competitors for:
--   "Sold Out" -> "In Stock" flips.
--   "Pre-order" availability.
--   Low stock warnings.
-
-### 3. SEO Intelligence
-Protect your rankings. Catch silent changes to:
--   Page Titles and Meta Descriptions.
--   H1 Headers.
--   Canonical tags.
-
+-   **LCS Diff Engine**: Industry-leading stability that handles prepended list items and shifting layouts without false alerts.
+-   **Native Slack Integration**: Rich, color-coded alerts with intelligent price-drop detection.
+-   **Visual Proof**: Context-aware screenshots that highlight exactly what changed in glowing red.
+-   **AI Intelligence**: (Optional) Human-readable summaries explaining the business impact of a change.
+-   **Auto-Persistence**: Named Key-Value Stores preserve state safely across scheduled cron runs.
 
 ---
 
-## 🛠 Usage
+## 📚 Documentation Hub
 
-### Input Configuration
+For deep technical details, operational strategies, and setup guides, visit the **[SWIM Documentation Hub](file:///c:/Users/jobsb/Desktop/webchange-actor/docs/index.html)**.
 
-The actor accepts a clean JSON input. The only required field is `targetUrl`.
+### Sub-Modules:
+1.  **[Getting Started](file:///c:/Users/jobsb/Desktop/webchange-actor/docs/setup.html)**: 3-minute setup and full input reference.
+2.  **[Architecture](file:///c:/Users/jobsb/Desktop/webchange-actor/docs/architecture.html)**: Technical map and LCS engine details.
+3.  **[System Design](file:///c:/Users/jobsb/Desktop/webchange-actor/docs/system-design.html)**: Scoring logic and persistence strategy.
+4.  **[Use Cases](file:///c:/Users/jobsb/Desktop/webchange-actor/docs/use-cases.html)**: Business scenarios and alert lifecycles.
+5.  **[Operations](file:///c:/Users/jobsb/Desktop/webchange-actor/docs/operations.html)**: Multi-competitor monitoring at scale.
+6.  **[Troubleshooting](file:///c:/Users/jobsb/Desktop/webchange-actor/docs/troubleshooting.html)**: FAQ and anti-scraping solutions.
+7.  **[Developer Guide](file:///c:/Users/jobsb/Desktop/webchange-actor/docs/developer.html)**: Local dev and extension points.
 
+---
+
+## 🚀 Quick Start
+
+1.  **Create an Apify Task** based on the SWIM Actor.
+2.  **Set `targetUrl`** to the product or page you want to monitor.
+3.  **Configure `slackWebhookUrl`** to receive instant alerts.
+4.  **(Optional)** Enable `useVisualProof` for visual confirmation of changes.
+
+### Minimal Input Example:
 ```json
 {
     "targetUrl": "https://example.com/product/123",
     "preset": "competitor-pricing",
-    "useAi": true,
-    "notificationConfig": {
-        "webhookUrl": "https://hooks.zapier.com/..."
-    }
+    "slackWebhookUrl": "https://hooks.slack.com/services/...",
+    "useVisualProof": true,
+    "proxyConfiguration": { "useApifyProxy": true }
 }
 ```
 
-### Available Presets
-
-| Preset | Optimized For | Triggers On |
-| :--- | :--- | :--- |
-| **`competitor-pricing`** | **E-commerce / SaaS** | Price changes, discounts, currency updates. |
-| `inventory-tracker` | **Supply Chain / Retail** | "Sold Out", "In Stock", "Backorder" status changes. |
-| `seo-intelligence`  | **Growth / Marketing**    | Changes to Title tags, Meta descriptions, or H1s.   |
-| `generic` | **Power Users** | Custom selectors for any other use case. |
-
 ---
 
-## 📦 Output Example
+## 📦 Output Contract
 
-You get a clean JSON result pushed to the default Apify Dataset.
-
+SWIM pushes a structured JSON analysis to the Apify Dataset:
 ```json
 {
-    "url": "https://example.com/pricing",
-    "timestamp": "2023-10-27T10:00:00Z",
-    "changeDetected": true,
-    "severityScore": 85,
-    "changeType": "content_modified",
-    "diffSummary": {
-        "text": "Price changed from $10 to $12",
-        "structured": [
-            {
-                "path": "div.price[0]",
-                "old": "$10",
-                "new": "$12",
-                "type": "modified"
-            }
-        ]
-    },
-    "aiAnalysis": {
-        "summary": "Price increased by 20%.",
-        "reasoning": "Competitor adjusted monthly subscription rate."
-    }
+  "url": "https://example.com/product",
+  "changeDetected": true,
+  "severityScore": 85,
+  "classification": "price_drop",
+  "summary": "AI Summary: Price dropped from $99 to $79.",
+  "visualProofUrl": "https://api.apify.com/v2/key-value-stores/...",
+  "diff": [
+    { "type": "removed", "content": "$99.00", "selector": ".price" },
+    { "type": "added", "content": "$79.00", "selector": ".price" }
+  ]
 }
 ```
 
 ---
 
-## 💰 Cost & Performance
-
--   **Cost**: Efficient. Runs on minimal memory.
--   **AI Cost**: If `useAi` is enabled, small additional cost (bring your own key or use default).
--   **Frequency**: Recommended to run hourly for pricing and inventory.
+## 🛡️ Security & Privacy
+SWIM uses a **BYOK (Bring Your Own Key)** model for AI features. Your API secrets are handled securely via Apify's masked inputs and are never logged or stored by the core engine.
 
 ---
+*Built for quality, precision, and scale.*

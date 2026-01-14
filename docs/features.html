@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIM - Feature Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fafafa;
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #dc3545;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 40px;
+        }
+
+        .diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 5px solid #dc3545;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .card.optional {
+            border-top-color: #28a745;
+        }
+
+        .status {
+            font-size: 0.8em;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .status.required {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.optional {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        nav {
+            background: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: #dc3545;
+        }
+
+        nav a.active {
+            color: #dc3545;
+            font-weight: bold;
+            border-bottom: 2px solid #dc3545;
+        }
+
+        footer {
+            margin-top: 60px;
+            font-size: 0.9em;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="setup.html">Setup</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="system-design.html">Design</a>
+        <a href="features.html" class="active">Features</a>
+        <a href="use-cases.html">Use Cases</a>
+        <a href="operations.html">Operations</a>
+        <a href="developer.html">Developer</a>
+        <a href="security.html">Security</a>
+        <a href="troubleshooting.html">FAQ</a>
+    </nav>
+    <header>
+        <h1>Feature Set & Capabilities</h1>
+        <p>A comprehensive list of what SWIM can do for your business.</p>
+    </header>
+
+    <div class="diagram">
+        <img src="assets/features.svg" alt="Features Diagram">
+        <p><em>Figure 3: Core vs. Premium Features</em></p>
+    </div>
+
+    <section>
+        <div class="feature-grid">
+            <div class="card">
+                <span class="status required">REQUIRED</span>
+                <h3>LCS Engine</h3>
+                <p>The industry's most stable change detection. Handles prepended list items and shifting layouts
+                    without false alerts.</p>
+            </div>
+
+            <div class="card optional">
+                <span class="status optional">OPTIONAL</span>
+                <h3>AI Analysis</h3>
+                <p>Translates technical diffs into human-readable business insights. Requires an OpenAI or Anthropic API
+                    Key.</p>
+            </div>
+
+            <div class="card optional">
+                <span class="status optional">OPTIONAL</span>
+                <h3>Visual Proof</h3>
+                <p>Captures context-aware screenshots with glowing red highlights on exactly what changed.</p>
+            </div>
+
+            <div class="card optional">
+                <span class="status optional">OPTIONAL</span>
+                <h3>Slack Webhooks</h3>
+                <p>Rich Block formatted alerts with color-coded severity. Green alerts specifically for price drops.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 SWIM Project - Built for Apify Production.
+    </footer>
+</body>
+
+</html>

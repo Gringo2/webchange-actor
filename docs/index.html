@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIM Documentation Hub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            background: #fdfdfd;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            color: #666;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .module {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color: #007bff;
+        }
+
+        .module h2 {
+            margin-top: 0;
+            font-size: 1.3em;
+        }
+
+        .module p {
+            color: #777;
+            font-size: 0.85em;
+            margin-bottom: 0;
+            line-height: 1.4;
+        }
+
+        .icon {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .setup-icon {
+            color: #007bff;
+        }
+
+        .arch-icon {
+            color: #0056b3;
+        }
+
+        .design-icon {
+            color: #28a745;
+        }
+
+        .feature-icon {
+            color: #dc3545;
+        }
+
+        .flow-icon {
+            color: #6f42c1;
+        }
+
+        .ops-icon {
+            color: #fd7e14;
+        }
+
+        .trouble-icon {
+            color: #c82333;
+        }
+
+        .dev-icon {
+            color: #343a40;
+        }
+
+        .sec-icon {
+            color: #17a2b8;
+        }
+
+        nav {
+            background: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: #333;
+        }
+
+        nav a.active {
+            color: #333;
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html" class="active">Hub</a>
+        <a href="setup.html">Setup</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="system-design.html">Design</a>
+        <a href="features.html">Features</a>
+        <a href="use-cases.html">Use Cases</a>
+        <a href="operations.html">Operations</a>
+        <a href="developer.html">Developer</a>
+        <a href="security.html">Security</a>
+        <a href="troubleshooting.html">FAQ</a>
+    </nav>
+    <div class="hero">
+        <h1>SWIM Documentation Hub</h1>
+        <p>The Master Manual for the Semantic Web Intelligent Monitor.</p>
+    </div>
+
+    <div class="grid">
+        <a href="setup.html" class="module">
+            <span class="icon setup-icon">🚀</span>
+            <h2>Getting Started</h2>
+            <p>Setup guide, input reference, and JSON integration schema.</p>
+        </a>
+
+        <a href="architecture.html" class="module">
+            <span class="icon arch-icon">🌐</span>
+            <h2>Architecture</h2>
+            <p>Technical map, LCS engine, and component connectivity.</p>
+        </a>
+
+        <a href="system-design.html" class="module">
+            <span class="icon design-icon">🧠</span>
+            <h2>System Design</h2>
+            <p>Internal logic, heuristic scoring, and persistence strategy.</p>
+        </a>
+
+        <a href="features.html" class="module">
+            <span class="icon feature-icon">💎</span>
+            <h2>Feature Set</h2>
+            <p>Core vs. Premium capabilities and activation triggers.</p>
+        </a>
+
+        <a href="use-cases.html" class="module">
+            <span class="icon flow-icon">🔄</span>
+            <h2>Use Cases</h2>
+            <p>Business scenarios, pricing/inventory, and alert lifecycles.</p>
+        </a>
+
+        <a href="operations.html" class="module">
+            <span class="icon ops-icon">⚙️</span>
+            <h2>Operations</h2>
+            <p>Scheduling, multi-competitor strategy, and production tips.</p>
+        </a>
+
+        <a href="developer.html" class="module">
+            <span class="icon dev-icon">👩‍💻</span>
+            <h2>Developer Guide</h2>
+            <p>Codebase structure, local dev, and extension points.</p>
+        </a>
+
+        <a href="security.html" class="module">
+            <span class="icon sec-icon">🛡️</span>
+            <h2>Security & Trust</h2>
+            <p>BYOK model, secrets management, and data privacy.</p>
+        </a>
+
+        <a href="troubleshooting.html" class="module">
+            <span class="icon trouble-icon">⚠️</span>
+            <h2>Troubleshooting</h2>
+            <p>FAQ, common error codes, and anti-scraping solutions.</p>
+        </a>
+    </div>
+
+    <footer>
+        Documentation generated on January 14, 2026. Built for quality and scale.
+    </footer>
+</body>
+
+</html>

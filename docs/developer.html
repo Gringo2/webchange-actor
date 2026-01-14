@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIM - Developer Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fafafa;
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 40px;
+        }
+
+        .diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #ccc;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        nav {
+            background: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        nav a.active {
+            color: #007bff;
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+
+        footer {
+            margin-top: 60px;
+            font-size: 0.9em;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="setup.html">Setup</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="system-design.html">Design</a>
+        <a href="features.html">Features</a>
+        <a href="use-cases.html">Use Cases</a>
+        <a href="operations.html">Operations</a>
+        <a href="developer.html" class="active">Developer</a>
+        <a href="security.html">Security</a>
+        <a href="troubleshooting.html">FAQ</a>
+    </nav>
+    <header>
+        <h1>Developer Guide & Extensibility</h1>
+        <p>A guide for engineers looking to customize or extend the SWIM codebase.</p>
+    </header>
+
+    <div class="diagram">
+        <img src="assets/developer.svg" alt="Extensibility Map">
+        <p><em>Figure 8: Core vs. Extension Points</em></p>
+    </div>
+
+    <section>
+        <h2>Project Structure</h2>
+        <pre>
+src/
+├── core/           # The Engine (LCS Diff, Fetcher, Preprocessor)
+├── intelligence/   # Logic (Classifier, Scorer, Deduplicator)
+├── notifications/  # Output channels (Slack, etc.)
+├── storage/        # Persistence (HistoryStore)
+└── config.ts       # Preset definitions
+        </pre>
+
+        <h2>How to Add a New Preset</h2>
+        <p>Presets are defined in <code>src/config.ts</code>. To add a new one:</p>
+        <ol>
+            <li>Open <code>src/config.ts</code>.</li>
+            <li>Add a new entry to the <code>PRESETS</code> record.</li>
+            <li>Update <code>src/types.ts</code> to include your new preset name in the Zod enum.</li>
+        </ol>
+
+        <h2>Adding a New Output Channel</h2>
+        <p>SWIM's modular design makes it easy to add new alert destinations (e.g., Discord, Email, Microsoft Teams).
+        </p>
+        <ol>
+            <li>Create a new file in <code>src/notifications/</code> (e.g., <code>discord.ts</code>).</li>
+            <li>Implement an async <code>notify</code> method.</li>
+            <li>Import and call it from the main loops in <code>src/main.ts</code>.</li>
+        </ol>
+
+        <h2>Local Development</h2>
+        <p>To run the actor locally for testing:</p>
+        <pre>
+npm install
+npm run start:dev
+        </pre>
+        <p>This uses <code>tsx</code> to run the TypeScript code directly without a full build step.</p>
+    </section>
+
+    <footer>
+        &copy; 2026 SWIM Project - Developer Manual.
+    </footer>
+</body>
+
+</html>

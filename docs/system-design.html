@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIM - System Design</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fafafa;
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #28a745;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 40px;
+        }
+
+        .diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #28a745;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        nav {
+            background: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: #28a745;
+        }
+
+        nav a.active {
+            color: #28a745;
+            font-weight: bold;
+            border-bottom: 2px solid #28a745;
+        }
+
+        footer {
+            margin-top: 60px;
+            font-size: 0.9em;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="setup.html">Setup</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="system-design.html" class="active">Design</a>
+        <a href="features.html">Features</a>
+        <a href="use-cases.html">Use Cases</a>
+        <a href="operations.html">Operations</a>
+        <a href="developer.html">Developer</a>
+        <a href="security.html">Security</a>
+        <a href="troubleshooting.html">FAQ</a>
+    </nav>
+    <header>
+        <h1>System Design & Decision Logic</h1>
+        <p>Documentation of the internal logic and persistence strategy.</p>
+    </header>
+
+    <div class="diagram">
+        <img src="assets/data-flow.svg" alt="Data Flow Diagram">
+        <p><em>Figure 2: Data Life Cycle & Persistence</em></p>
+    </div>
+
+    <section>
+        <h2>Persistence Strategy</h2>
+        <div class="card">
+            <h3>Named Key-Value Stores</h3>
+            <p>To support scheduled runs on Apify, SWIM utilizes named stores:</p>
+            <ul>
+                <li><strong>SWIM-SNAPSHOTS</strong>: Stores the baseline HTML for comparison.</li>
+                <li><strong>SWIM-HISTORY</strong>: Maintains a version history of last N changes.</li>
+                <li><strong>SWIM-DEDUPE</strong>: Stores event hashes to prevent duplicate alerts within a cooldown
+                    period.</li>
+            </ul>
+        </div>
+
+        <h2>Semantic Classification</h2>
+        <div class="card">
+            <h3>Heuristic Scoring</h3>
+            <p>The system calculates a <strong>Severity Score (0-100)</strong> by combining:</p>
+            <ul>
+                <li><strong>Selector Priority</strong> (e.g., .price > .footer)</li>
+                <li><strong>Keyword Matches</strong> (e.g., "Sold Out", "Sale")</li>
+                <li><strong>Numeric Change Detection</strong> (e.g., price drops)</li>
+            </ul>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 SWIM Project - Built for Apify Production.
+    </footer>
+</body>
+
+</html>

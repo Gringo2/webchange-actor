@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIM - System Architecture</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fafafa;
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 40px;
+        }
+
+        .diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #007bff;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        nav {
+            background: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        nav a.active {
+            color: #007bff;
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+
+        footer {
+            margin-top: 60px;
+            font-size: 0.9em;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="setup.html">Setup</a>
+        <a href="architecture.html" class="active">Architecture</a>
+        <a href="system-design.html">Design</a>
+        <a href="features.html">Features</a>
+        <a href="use-cases.html">Use Cases</a>
+        <a href="operations.html">Operations</a>
+        <a href="developer.html">Developer</a>
+        <a href="security.html">Security</a>
+        <a href="troubleshooting.html">FAQ</a>
+    </nav>
+    <header>
+        <h1>System Architecture</h1>
+        <p>A deep dive into the high-level components and connectivity of the Semantic Web Intelligent Monitor.</p>
+    </header>
+
+    <div class="diagram">
+        <img src="assets/architecture.svg" alt="Architecture Diagram">
+        <p><em>Figure 1: Component Interaction Map</em></p>
+    </div>
+
+    <section>
+        <h2>The Core Pipeline</h2>
+        <div class="card">
+            <h3>1. Input & Fetching</h3>
+            <p>Every run begins with Zod-validated input. The <code>CheerioFetcher</code> initiates a proxy-aware HTTP
+                request to the target URL. Cheerio is used first to minimize compute cost and maximize speed.</p>
+        </div>
+
+        <div class="card">
+            <h3>2. Signal Processing (Normalization)</h3>
+            <p>The <code>Preprocessor</code> strips noise. It targets dynamic attributes (IDs, test tags) and collapses
+                whitespace. This is critical for the LCS engine to function without false positives.</p>
+        </div>
+
+        <div class="card">
+            <h3>3. Comparison (LCS Engine)</h3>
+            <p>Unlike standard scrapers that compare indexed arrays, SWIM uses the <strong>Longest Common Subsequence
+                    (LCS)</strong> algorithm. This allows the system to detect shifting content (like new products being
+                prepended to a list) as a single addition rather than a massive layout shift.</p>
+        </div>
+
+        <div class="card">
+            <h3>4. Intelligence & Decisions</h3>
+            <p>The <code>Scorer</code> and <code>Classifier</code> evaluate the diffs. They decide if a change is
+                "Sensitive" (Pricing/Inventory) or "Structural".</p>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 SWIM Project - Built for Apify Production.
+    </footer>
+</body>
+
+</html>

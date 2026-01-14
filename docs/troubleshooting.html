@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIM - Troubleshooting & FAQ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fafafa;
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #dc3545;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 40px;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 6px solid #dc3545;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-item h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .error-code {
+            font-family: monospace;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        nav {
+            background: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: #dc3545;
+        }
+
+        nav a.active {
+            color: #dc3545;
+            font-weight: bold;
+            border-bottom: 2px solid #dc3545;
+        }
+
+        footer {
+            margin-top: 60px;
+            font-size: 0.9em;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="setup.html">Setup</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="system-design.html">Design</a>
+        <a href="features.html">Features</a>
+        <a href="use-cases.html">Use Cases</a>
+        <a href="operations.html">Operations</a>
+        <a href="developer.html">Developer</a>
+        <a href="security.html">Security</a>
+        <a href="troubleshooting.html" class="active">FAQ</a>
+    </nav>
+    <header>
+        <h1>Troubleshooting & FAQ</h1>
+        <p>Common solutions and answers for production monitoring with SWIM.</p>
+    </header>
+
+    <section>
+        <div class="faq-item">
+            <h3>❓ I'm getting "Change Detected" but the page looks the same.</h3>
+            <p>This is usually due to <strong>Invisible HTML shifts</strong> (e.g., hidden SEO meta tags or dynamic
+                script IDs). While the <code>Preprocessor</code> removes 99% of this, some sites use custom attributes.
+            </p>
+            <p><strong>Solution:</strong> Check the <code>#debug</code> metadata in your dataset. It will show you
+                exactly which hidden tags changed.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3>❓ The Actor is being blocked by a website.</h3>
+            <p>Modern sites use sophisticated anti-scraping. Direct requests often get blocked with a 403 or 407 error.
+            </p>
+            <p><strong>Solution:</strong> Enable <code>proxyConfiguration</code> in your settings. Using Apify's
+                Residential proxies is highly recommended for e-commerce sites.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3>❓ Visual Proof screenshots are showing the wrong area.</h3>
+            <p>SWIM tries to guess the best area to screenshot based on your preset, but sometimes layouts are too
+                complex.</p>
+            <p><strong>Solution:</strong> Provide a custom <code>cssSelector</code> in the input. SWIM will precisely
+                target that element for its Visual Proof.</p>
+        </div>
+
+        <h2>Common Error Codes</h2>
+        <div class="faq-item">
+            <p><span class="error-code">SNAPSHOT_NOT_FOUND</span>: This is normal for your first run. SWIM is just
+                creating a baseline.</p>
+            <p><span class="error-code">PROXY_LIMIT_EXCEEDED</span>: You have run out of proxy credits on your Apify
+                account.</p>
+            <p><span class="error-code">AI_KEY_INVALID</span>: Your OpenAI or Anthropic key is expired or incorrect.</p>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 SWIM Project - Troubleshooting Module.
+    </footer>
+</body>
+
+</html>

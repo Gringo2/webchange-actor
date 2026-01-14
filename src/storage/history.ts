@@ -17,7 +17,7 @@ export class HistoryStore {
      * Retrieves the full history for a URL.
      */
     async getHistory(url: string): Promise<HistoryItem[]> {
-        const store = await Actor.openKeyValueStore();
+        const store = await Actor.openKeyValueStore('SWIM-HISTORY');
         const key = await this.getStoreKey(url);
         const history = await store.getValue(key) as HistoryItem[];
         return history || [];
@@ -27,7 +27,7 @@ export class HistoryStore {
      * Adds a new snapshot to the history and prunes old entries.
      */
     async push(url: string, html: string, maxDepth: number = 5): Promise<void> {
-        const store = await Actor.openKeyValueStore();
+        const store = await Actor.openKeyValueStore('SWIM-HISTORY');
         const key = await this.getStoreKey(url);
 
         const history = await this.getHistory(url);

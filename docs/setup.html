@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIM - Getting Started & Configuration</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fafafa;
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 40px;
+        }
+
+        .diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        .config-table th,
+        .config-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .config-table th {
+            background-color: #f2f2f2;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        nav {
+            background: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        nav a.active {
+            color: #007bff;
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+
+        footer {
+            margin-top: 60px;
+            font-size: 0.9em;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Hub</a>
+        <a href="setup.html" class="active">Setup</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="system-design.html">Design</a>
+        <a href="features.html">Features</a>
+        <a href="use-cases.html">Use Cases</a>
+        <a href="operations.html">Operations</a>
+        <a href="developer.html">Developer</a>
+        <a href="security.html">Security</a>
+        <a href="troubleshooting.html">FAQ</a>
+    </nav>
+    <header>
+        <h1>Getting Started & Configuration</h1>
+        <p>A step-by-step guide to deploying your first intelligent web monitor.</p>
+    </header>
+
+    <div class="diagram">
+        <img src="assets/setup.svg" alt="Setup Flow">
+        <p><em>Figure 7: The Monitor Setup Process</em></p>
+    </div>
+
+    <section>
+        <h2>Quick Start (3 Minutes)</h2>
+        <ol>
+            <li><strong>Create an Apify Task</strong> based on the SWIM Actor.</li>
+            <li><strong>Set the <code>targetUrl</code></strong> to the product or page you want to track.</li>
+            <li><strong>Select a <code>preset</code></strong> (e.g., <code>competitor-pricing</code>).</li>
+            <li><strong>Click Run</strong> to establish your first baseline.</li>
+        </ol>
+
+        <h2>Input Reference Guide</h2>
+        <table class="config-table">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>targetUrl</code></td>
+                    <td>URL (String)</td>
+                    <td><em>Required</em></td>
+                    <td>The full URL of the page you wish to monitor.</td>
+                </tr>
+                <tr>
+                    <td><code>preset</code></td>
+                    <td>Enum</td>
+                    <td><code>competitor-pricing</code></td>
+                    <td>One of: <code>competitor-pricing</code>, <code>inventory-tracker</code>,
+                        <code>seo-intelligence</code>, <code>generic</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>useVisualProof</code></td>
+                    <td>Boolean</td>
+                    <td><code>false</code></td>
+                    <td>Enable context-aware screenshots on detected changes.</td>
+                </tr>
+                <tr>
+                    <td><code>slackWebhookUrl</code></td>
+                    <td>URL (String)</td>
+                    <td><code>null</code></td>
+                    <td>Your Slack Incoming Webhook URL for rich alerts.</td>
+                </tr>
+                <tr>
+                    <td><code>useAi</code></td>
+                    <td>Boolean</td>
+                    <td><code>false</code></td>
+                    <td>Summarize changes using LLM (requires API Key).</td>
+                </tr>
+                <tr>
+                    <td><code>cooldownPeriodMinutes</code></td>
+                    <td>Number</td>
+                    <td><code>60</code></td>
+                    <td>Prevents duplicate alerts for the same change within this window.</td>
+            </tbody>
+        </table>
+
+        <h2>Dataset Output Format</h2>
+        <p>When a change is detected, SWIM pushes a detailed analysis result to the Apify Dataset. Below is an example
+            of the structured JSON output:</p>
+        <pre style="background: #2d2d2d; color: #ccc; padding: 15px; border-radius: 8px; overflow-x: auto;">
+{
+  "url": "https://example.com/product",
+  "changeDetected": true,
+  "severityScore": 85,
+  "classification": "price_drop",
+  "summary": "AI Summary: Price dropped from $99 to $79.",
+  "visualProofUrl": "https://api.apify.com/v2/key-value-stores/...",
+  "diff": [
+    { "type": "removed", "content": "$99.00", "selector": ".price" },
+    { "type": "added", "content": "$79.00", "selector": ".price" }
+  ],
+  "#debug": {
+    "runId": "abc123xyz",
+    "preset": "competitor-pricing",
+    "engine": "lcs-v1.1"
+  }
+}
+        </pre>
+        <p>This structured format allows for easy integration into custom dashboards, ERPs, or external databases.</p>
+    </section>
+
+    <footer>
+        &copy; 2026 SWIM Project - Guided Setup Module.
+    </footer>
+</body>
+
+</html>
+
+</html>

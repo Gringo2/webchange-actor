@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="blackarrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="400" fill="#fff" />
+  <text x="400" y="40" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">Logic Flow &amp; Life Cycle</text>
+  
+  <!-- Steps -->
+  <circle cx="100" cy="120" r="40" fill="#007bff" />
+  <text x="100" y="125" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">Fetch</text>
+  
+  <rect x="200" y="100" width="100" height="40" fill="#17a2b8" rx="5" />
+  <text x="250" y="125" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">Denoise</text>
+  
+  <!-- Decision Diamond -->
+  <path d="M 450,80 L 500,120 L 450,160 L 400,120 Z" fill="#ffc107" stroke="#d39e00" stroke-width="1" />
+  <text x="450" y="125" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">Diff?</text>
+  
+  <rect x="600" y="100" width="100" height="40" fill="#28a745" rx="5" />
+  <text x="650" y="125" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">Notify</text>
+  
+  <rect x="400" y="220" width="100" height="40" fill="#dc3545" rx="5" />
+  <text x="450" y="245" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">Exit</text>
+  
+  <!-- Connectors -->
+  <line x1="140" y1="120" x2="190" y2="120" stroke="#333" stroke-width="2" marker-end="url(#blackarrow)" />
+  <line x1="300" y1="120" x2="390" y2="120" stroke="#333" stroke-width="2" marker-end="url(#blackarrow)" />
+  <line x1="500" y1="120" x2="590" y2="120" stroke="#333" stroke-width="2" marker-end="url(#blackarrow)" />
+  <line x1="450" y1="160" x2="450" y2="210" stroke="#333" stroke-width="2" marker-end="url(#blackarrow)" />
+  
+  <text x="460" y="195" font-family="Arial, sans-serif" font-size="11" fill="#666">No Change</text>
+</svg>

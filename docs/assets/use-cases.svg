@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="400" fill="#fcfcfc" />
+  <text x="400" y="40" font-family="Arial, sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#333">Platform Use Cases</text>
+  
+  <!-- Use Case 1: Pricing -->
+  <rect x="50" y="100" width="200" height="220" rx="15" fill="white" stroke="#007bff" stroke-width="2" />
+  <text x="150" y="135" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#007bff" text-anchor="middle">Competitor Pricing</text>
+  <text x="150" y="170" font-family="Arial, sans-serif" font-size="13" fill="#666" text-anchor="middle">Monitors:</text>
+  <text x="150" y="195" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• Product Price Changes</text>
+  <text x="150" y="215" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• Discount Percentage</text>
+  <text x="150" y="235" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• Fare/Rate Fluctuations</text>
+  <rect x="90" y="260" width="120" height="30" rx="5" fill="#e7f3ff" />
+  <text x="150" y="280" font-family="Arial, sans-serif" font-size="11" fill="#007bff" text-anchor="middle" font-weight="bold">AI Summary Alerts</text>
+  
+  <!-- Use Case 2: Inventory -->
+  <rect x="300" y="100" width="200" height="220" rx="15" fill="white" stroke="#28a745" stroke-width="2" />
+  <text x="400" y="135" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#28a745" text-anchor="middle">Inventory Tracker</text>
+  <text x="400" y="170" font-family="Arial, sans-serif" font-size="13" fill="#666" text-anchor="middle">Monitors:</text>
+  <text x="400" y="195" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• Stock Status Flips</text>
+  <text x="400" y="215" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• "Sold Out" Indicators</text>
+  <text x="400" y="235" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• Availability Tags</text>
+  <rect x="340" y="260" width="120" height="30" rx="5" fill="#ecf9ef" />
+  <text x="400" y="280" font-family="Arial, sans-serif" font-size="11" fill="#28a745" text-anchor="middle" font-weight="bold">Visual Proof Reciept</text>
+  
+  <!-- Use Case 3: SEO -->
+  <rect x="550" y="100" width="200" height="220" rx="15" fill="white" stroke="#dc3545" stroke-width="2" />
+  <text x="650" y="135" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#dc3545" text-anchor="middle">SEO Intelligence</text>
+  <text x="650" y="170" font-family="Arial, sans-serif" font-size="13" fill="#666" text-anchor="middle">Monitors:</text>
+  <text x="650" y="195" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• HTML Title Tags</text>
+  <text x="650" y="215" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• Meta Descriptions</text>
+  <text x="650" y="235" font-family="Arial, sans-serif" font-size="12" fill="#333" text-anchor="middle">• H1 Header Shifts</text>
+  <rect x="590" y="260" width="120" height="30" rx="5" fill="#fbeeee" />
+  <text x="650" y="280" font-family="Arial, sans-serif" font-size="11" fill="#dc3545" text-anchor="middle" font-weight="bold">Growth Team Alerts</text>
+</svg>
