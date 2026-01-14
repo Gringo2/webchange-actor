@@ -1,0 +1,89 @@
+{
+    "title": "SWIM: Semantic Web Intelligent Monitor",
+    "description": "AI-powered semantic web change monitor.",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "targetUrl": {
+            "title": "Target URL",
+            "type": "string",
+            "description": "The URL of the page you want to monitor.",
+            "editor": "textfield",
+            "prefill": "https://example.com"
+        },
+        "preset": {
+            "title": "Preset Strategy",
+            "type": "string",
+            "description": "Select a monitoring strategy tailored for specific use cases.",
+            "editor": "select",
+            "default": "generic",
+            "enum": [
+                "pricing",
+                "policy",
+                "competitor",
+                "generic"
+            ],
+            "enumTitles": [
+                "Pricing Monitor",
+                "Policy/Legal Monitor",
+                "Competitor Analysis",
+                "Generic Monitor"
+            ]
+        },
+        "cssSelector": {
+            "title": "CSS Selector",
+            "type": "string",
+            "description": "Restrict monitoring to specific parts of the page (e.g., '.product-details'). Leave empty for whole page.",
+            "editor": "textfield"
+        },
+        "useAi": {
+            "title": "Use AI Analysis",
+            "type": "boolean",
+            "description": "Enable AI to interpret and summarize changes (requires API Key).",
+            "default": false
+        },
+        "aiOptions": {
+            "title": "AI Configuration",
+            "type": "object",
+            "description": "Settings for the AI Interpreter.",
+            "properties": {
+                "apiKey": {
+                    "title": "OpenAI API Key",
+                    "type": "string",
+                    "description": "Your OpenAI API key.",
+                    "editor": "textfield",
+                    "isSecret": true
+                },
+                "model": {
+                    "title": "AI Model",
+                    "type": "string",
+                    "description": "LLM model to use (default: gpt-4-turbo-preview).",
+                    "editor": "textfield",
+                    "default": "gpt-4-turbo-preview"
+                }
+            }
+        },
+        "notificationConfig": {
+            "title": "Notification Settings",
+            "type": "object",
+            "description": "Configure alerts for detected changes.",
+            "properties": {
+                "webhookUrl": {
+                    "title": "Webhook URL",
+                    "type": "string",
+                    "description": "URL to send a POST request to when a significant change is detected.",
+                    "editor": "textfield"
+                },
+                "authHeader": {
+                    "title": "Authorization Header",
+                    "type": "string",
+                    "description": "Optional Authorization header value for the webhook.",
+                    "editor": "textfield"
+                }
+            }
+        }
+    },
+    "required": [
+        "targetUrl"
+    ]
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Architecture - V1 & V2</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        text {
+            font-size: 12px;
+            fill: #333;
+            text-anchor: middle;
+        }
+
+        .node-rect {
+            fill: #e1f5fe;
+            stroke: #01579b;
+            stroke-width: 2;
+            rx: 5;
+        }
+
+        .decision-rect {
+            fill: #fff9c4;
+            stroke: #fbc02d;
+            stroke-width: 2;
+            transform: rotate(45deg);
+        }
+
+        .group-rect {
+            fill: none;
+            stroke: #999;
+            stroke-width: 1;
+            stroke-dasharray: 4;
+        }
+
+        .group-label {
+            font-weight: bold;
+            fill: #666;
+            font-size: 14px;
+            text-anchor: start;
+        }
+
+        .arrow {
+            stroke: #333;
+            stroke-width: 1.5;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="diagram-container">
+        <svg width="600" height="900" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- INPUT GROUP -->
+            <rect x="50" y="50" width="220" height="200" class="group-rect" />
+            <text x="60" y="70" class="group-label">Input</text>
+
+            <rect x="100" y="90" width="120" height="30" class="node-rect" />
+            <text x="160" y="110">Input JSON</text>
+
+            <rect x="100" y="150" width="120" height="30" class="node-rect" />
+            <text x="160" y="170">Config Manager</text>
+
+            <line x1="160" y1="120" x2="160" y2="150" class="arrow" />
+
+            <!-- CORE V1 GROUP -->
+            <rect x="300" y="50" width="250" height="500" class="group-rect" />
+            <text x="310" y="70" class="group-label">Core V1 Logic</text>
+
+            <rect x="365" y="90" width="120" height="30" class="node-rect" />
+            <text x="425" y="110">Fetcher</text>
+
+            <rect x="365" y="150" width="120" height="30" class="node-rect" />
+            <text x="425" y="170">Preprocessor</text>
+
+            <line x1="425" y1="120" x2="425" y2="150" class="arrow" />
+
+            <rect x="365" y="210" width="120" height="30" class="node-rect" />
+            <text x="425" y="230">Snapshot Store</text>
+
+            <line x1="425" y1="180" x2="425" y2="210" class="arrow" />
+
+            <rect x="365" y="270" width="120" height="30" class="node-rect" />
+            <text x="425" y="290">Diff Engine</text>
+
+            <line x1="425" y1="240" x2="425" y2="270" class="arrow" />
+
+            <rect x="365" y="330" width="120" height="30" class="node-rect" />
+            <text x="425" y="350">Classifier</text>
+
+            <line x1="425" y1="300" x2="425" y2="330" class="arrow" />
+
+            <rect x="365" y="390" width="120" height="30" class="node-rect" />
+            <text x="425" y="410">AI Interpreter</text>
+
+            <line x1="425" y1="360" x2="425" y2="390" class="arrow" />
+
+            <rect x="365" y="450" width="120" height="30" class="node-rect" />
+            <text x="425" y="470">Severity Scorer</text>
+
+            <line x1="425" y1="420" x2="425" y2="450" class="arrow" />
+
+            <!-- Connection Input -> Core -->
+            <line x1="220" y1="165" x2="365" y2="165" class="arrow" />
+
+            <!-- EXTENSIONS V2 GROUP -->
+            <rect x="50" y="580" width="220" height="250" class="group-rect" />
+            <text x="60" y="600" class="group-label">V2 Extensions</text>
+
+            <rect x="100" y="620" width="120" height="30" class="node-rect" />
+            <text x="160" y="640">Deduplicator</text>
+
+            <rect x="100" y="680" width="120" height="30" class="node-rect" />
+            <text x="160" y="700">History Store</text>
+
+            <!-- Connection Core -> Extensions -->
+            <line x1="425" y1="480" x2="425" y2="635" class="arrow" />
+            <line x1="425" y1="635" x2="220" y2="635" class="arrow" />
+
+            <line x1="160" y1="650" x2="160" y2="680" class="arrow" />
+
+            <!-- OUTPUT GROUP -->
+            <rect x="300" y="580" width="250" height="250" class="group-rect" />
+            <text x="310" y="600" class="group-label">Output</text>
+
+            <rect x="365" y="620" width="120" height="30" class="node-rect" />
+            <text x="425" y="640">Output Manager</text>
+
+            <rect x="365" y="680" width="120" height="30" class="node-rect" />
+            <text x="425" y="700">Dataset / API</text>
+
+            <rect x="365" y="740" width="120" height="30" class="node-rect" />
+            <text x="425" y="760">Webhook</text>
+
+            <!-- Connection Extensions -> Output -->
+            <line x1="220" y1="695" x2="365" y2="635" class="arrow" /> <!-- Simplified Path -->
+
+            <line x1="425" y1="650" x2="425" y2="680" class="arrow" />
+            <line x1="425" y1="710" x2="425" y2="740" class="arrow" />
+
+        </svg>
+    </div>
+
+</body>
+
+</html>

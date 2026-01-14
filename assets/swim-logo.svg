@@ -1,0 +1,22 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="swimGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#01579b;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#0288d1;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <!-- Background Circle -->
+    <circle cx="100" cy="100" r="90" fill="white" stroke="url(#swimGradient)" stroke-width="8" />
+    
+    <!-- Stylized Waves (Water/Data) -->
+    <path d="M 40 120 Q 70 100 100 120 T 160 120" stroke="url(#swimGradient)" stroke-width="6" fill="none" stroke-linecap="round" />
+    <path d="M 40 140 Q 70 120 100 140 T 160 140" stroke="url(#swimGradient)" stroke-width="6" stroke-opacity="0.6" fill="none" stroke-linecap="round" />
+    
+    <!-- Intelligent Eye / Magnifying Glass -->
+    <circle cx="100" cy="80" r="25" fill="none" stroke="url(#swimGradient)" stroke-width="6" />
+    <circle cx="100" cy="80" r="8" fill="url(#swimGradient)" />
+    <line x1="118" y1="98" x2="135" y2="115" stroke="url(#swimGradient)" stroke-width="6" stroke-linecap="round" />
+    
+    <!-- Text Label -->
+    <text x="100" y="175" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#01579b" text-anchor="middle">SWIM</text>
+</svg>

@@ -1,0 +1,45 @@
+flowchart TD
+    subgraph Input
+        A["Input JSON"] -->|Validate| B("Config Manager")
+        B -->|Load| C{"Preset?"}
+        C -->|Yes| D["Load Preset Config"]
+        C -->|No| E["Use Custom Config"]
+    end
+
+    subgraph Core_V1 ["Core V1 Logic"]
+        F[Fetcher] -->|GET| G["HTML Content"]
+        G -->|Cheerio| H[Preprocessor]
+        H -->|Clean & Extract| I["Semantic Text"]
+        
+        J["Snapshot Store (KV)"] -->|Read Last| K{"Previous Snapshot?"}
+        I -->|Compare| L["Diff Engine"]
+        K -->|State| L
+        
+        L -->|"Diff Result"| M["Semantic Classifier"]
+        M -->|Rules| N["Enriched Diff"]
+        
+        N -->|Optional| O{"Use AI?"}
+        O -->|Yes| P["AI Interpreter (LLM)"]
+        O -->|No| Q[Skip]
+        P -->|Analysis| R["Final Diff"]
+        Q -->|Raw| R
+        
+        R -->|Calc| S["Severity Scorer"]
+    end
+
+    subgraph Extensions_V2 ["V2 Extensions"]
+        S -->|Score| T[Deduplicator]
+        T -->|Hash Check| U{"Is Duplicate?"}
+        U -->|Yes| V["Suppress Alert"]
+        U -->|No| W["Pass Through"]
+        
+        W -->|Save| X["History Store"]
+        X -->|Prune| Y["Rolling Window"]
+        X -->|Related| Z["Trend Analysis"]
+    end
+
+    subgraph Output
+        Z -->|Format| AA["Output Manager"]
+        AA -->|Push| AB["Apify Dataset"]
+        AA -->|Payload| AC["Webhook Trigger"]
+    end
