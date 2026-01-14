@@ -5,7 +5,7 @@ import { z } from 'zod';
  */
 export const InputSchema = z.object({
     targetUrl: z.string().url(),
-    preset: z.enum(['pricing', 'policy', 'competitor', 'generic']).default('generic'),
+    preset: z.enum(['competitor-pricing', 'inventory-tracker', 'seo-intelligence', 'generic']).default('competitor-pricing'),
     cssSelector: z.string().optional(),
     useAi: z.boolean().default(false),
     aiOptions: z.object({

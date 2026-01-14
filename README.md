@@ -1,67 +1,74 @@
-# <img src="./assets/swim-logo.svg" width="60" height="60" align="center" /> SWIM: Semantic Web Intelligent Monitor
+# <img src="./assets/swim-logo.svg" width="60" height="60" align="center" /> Competitor Pricing Change Monitor (AI-powered)
 
-**Precision-focused, production-ready actor for monitoring semantic changes on web pages.**
+**We don’t tell you that a page changed. We tell you *what* changed and *why* it matters.**
 
-This actor goes beyond simple HTML diffing. It uses structured analysis, noise reduction, and optional AI interpretation to detect *meaningful* changes (pricing, policies, product availability) while ignoring the noise (ads, timestamps, random IDs).
-
----
-
-## 🌟 Features
-
-### V1: The Core (MVP)
-- **Structured Diffing**: Ignores script modifications, style changes, and structural noise.
-- **Multi-Element Support**: Monitors product lists, grids, or multiple specific elements via CSS selectors.
-- **Smart Presets**: Pre-configured logic for Pricing, Policy, and Competitor monitoring.
-- **Severity Scoring**: Assigns a 0-100 impact score to every change.
-- **AI Interpretation**: (Optional) Uses LLMs (OpenAI) to explain *why* the change matters.
-- **Production Ready**: Robust error handling, MD5 URL hashing for safe storage, and structured logging.
-- **Apify Integration**: Native support for Dataset, KV Store (Hashed keys), and real Webhook Delivery.
-
-### V2: Extended Intelligence
-- **Deduplication Engine**: Prevents alert fatigue by hashing `(Diff + Severity + URL)`.
-- **Change History**: Tracks historical trends (e.g., price history over time).
-- **Explainability**: detailed `reasons` array in the output.
+This actor is a precision tool for monitoring pricing, inventory, and SEO changes. It uses semantic analysis to ignore ads, popups, and layout shifts, focusing only on the data that affects your revenue.
 
 ---
 
-## 🚀 Usage
+## 🌟 Why This Actor?
+
+-   **Zero Noise**: Ignores ads, timestamps, and random HTML changes.
+-   **Smart Defaults**: Pre-configured for pricing and inventory tracking right out of the box.
+-   **No Alert Fatigue**: Deduplication ensures you never get bombarded for the same event twice.
+-   **AI Explanation**: (Optional) Uses GPT-4 to tell you *why* a change matters (e.g., "Price increased by 20%", "Product is now Sold Out").
+
+---
+
+## 🚀 Use Cases
+
+### 1. Competitor Pricing (Default)
+Track your competitors' product pages. Get notified instantly when they:
+-   Lower their price.
+-   Run a new discount or sale.
+-   Change their subscription tiers.
+
+### 2. Inventory Tracking
+Stop losing revenue to stockouts. Monitor key suppliers or competitors for:
+-   "Sold Out" -> "In Stock" flips.
+-   "Pre-order" availability.
+-   Low stock warnings.
+
+### 3. SEO Intelligence
+Protect your rankings. Catch silent changes to:
+-   Page Titles and Meta Descriptions.
+-   H1 Headers.
+-   Canonical tags.
+
+
+---
+
+## 🛠 Usage
 
 ### Input Configuration
 
-The actor accepts a strict JSON input schema:
+The actor accepts a clean JSON input. The only required field is `targetUrl`.
 
 ```json
 {
-    "targetUrl": "https://example.com/pricing",
-    "preset": "pricing_monitor",
+    "targetUrl": "https://example.com/product/123",
+    "preset": "competitor-pricing",
     "useAi": true,
-    "aiOptions": {
-        "provider": "openai",
-        "apiKey": "sk-...",
-        "model": "gpt-4-turbo"
-    },
     "notificationConfig": {
         "webhookUrl": "https://hooks.zapier.com/..."
     }
 }
 ```
 
-### Presets
+### Available Presets
 
-| Preset | Target Elements | Keywords | Use Case |
-| :--- | :--- | :--- | :--- |
-| `pricing_monitor` | `.price`, `.amount`, `.offer` | price, cost, discount | E-commerce, SaaS pricing |
-| `policy_monitor` | `main`, `.legal`, `.terms` | liability, privacy, terms | Legal compliance, TOS updates |
-| `competitor_monitor` | `h1`, `h2`, `.features` | launch, new, beta | Competitive intelligence |
-| `generic_monitor` | `body` (noise reduced) | - | General purpose monitoring |
+| Preset | Optimized For | Triggers On |
+| :--- | :--- | :--- |
+| **`competitor-pricing`** | **E-commerce / SaaS** | Price changes, discounts, currency updates. |
+| `inventory-tracker` | **Supply Chain / Retail** | "Sold Out", "In Stock", "Backorder" status changes. |
+| `seo-intelligence`  | **Growth / Marketing**    | Changes to Title tags, Meta descriptions, or H1s.   |
+| `generic` | **Power Users** | Custom selectors for any other use case. |
 
 ---
 
-## 📦 Output
+## 📦 Output Example
 
-The actor pushes results to the default Apify Dataset.
-
-### Example Output (V1 + V2)
+You get a clean JSON result pushed to the default Apify Dataset.
 
 ```json
 {
@@ -75,7 +82,6 @@ The actor pushes results to the default Apify Dataset.
         "structured": [
             {
                 "path": "div.price[0]",
-                "selector": "#pricing > div.card:nth-child(1) > span.amount",
                 "old": "$10",
                 "new": "$12",
                 "type": "modified"
@@ -83,73 +89,18 @@ The actor pushes results to the default Apify Dataset.
         ]
     },
     "aiAnalysis": {
-        "summary": "The monthly subscription price increased by 20%.",
-        "reasoning": "Likely inflation adjustment or tier restructuring."
-    },
-    "v2": {
-        "isDuplicate": false,
-        "deduplicationHash": "a1b2c3d4...",
-        "historyDepth": 5,
-        "reasons": ["Price increase", "High severity score"]
+        "summary": "Price increased by 20%.",
+        "reasoning": "Competitor adjusted monthly subscription rate."
     }
 }
 ```
 
 ---
 
-## 🛠️ Installation & Development
+## 💰 Cost & Performance
 
-### Prerequisites
-- Node.js 16+
-- Apify CLI (`npm install -g apify-cli`)
-
-### Setup
-1. Clone the repository.
-2. Install dependencies:
-    ```bash
-    npm install
-    ```
-3. Run locally:
-    ```bash
-    apify run
-    ```
-
-### Testing
-To verify logic without live requests, use the mock tests:
-```bash
-npm test
-```
+-   **Cost**: Efficient. Runs on minimal memory.
+-   **AI Cost**: If `useAi` is enabled, small additional cost (bring your own key or use default).
+-   **Frequency**: Recommended to run hourly for pricing and inventory.
 
 ---
-
-## 💰 Resource Requirements
-
-**Memory:**
-- Minimum: 512 MB
-- Recommended: 1024 MB (for AI mode)
-- With large pages (>5MB HTML): 2048 MB
-
-**Runtime:**
-- Simple page: 5-10 seconds
-- Average page: 10-20 seconds
-- Complex page with AI: 20-30 seconds
-
-**Cost Estimate:**
-- Without AI: ~$0.01 per 100 runs
-- With AI (GPT-4): ~$0.05 per run (OpenAI API cost additional)
-
-**Recommended Schedule:**
-- Price monitoring: Every 6-12 hours
-- Policy monitoring: Daily
-- Competitor analysis: Every 24 hours
-
----
-
-## 🏗️ Architecture
-
-- **Fetcher**: HTTP-based (Cheerio) for speed and determinism.
-- **Diff Engine**: Structure-aware comparison algorithm.
-- **Snapshot Store**: Apify Key-Value store for persistence.
-- **Extensions**: Deduplicator & History Manager (V2).
-
-![Architecture](./planning/architecture.svg)

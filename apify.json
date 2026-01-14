@@ -1,7 +1,7 @@
 {
     "name": "semantic-web-intelligent-monitor-swim",
-    "title": "SWIM - Semantic Web Intelligent Monitor",
-    "description": "AI-powered change detection for web pages with deduplication and semantic analysis",
+    "title": "Competitor Pricing Change Monitor (AI-powered)",
+    "description": "Get alerted when competitors change prices — without noise or false alarms. AI-powered semantic change detection.",
     "version": "1.0.0",
     "buildTag": "latest",
     "dockerfile": "./Dockerfile",
