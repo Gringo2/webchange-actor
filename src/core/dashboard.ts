@@ -172,8 +172,8 @@ export class DashboardGenerator {
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; font-size: 0.9em; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
                      ${result.productName ? `<div><strong>Product:</strong> ${result.productName.substring(0, 40)}...</div>` : ''}
-                     ${result.oldPrice && result.newPrice ? `<div><strong>Price:</strong> <span style="text-decoration: line-through; color: var(--text-muted);">$${result.oldPrice}</span> ➝ <span style="color: var(--positive); font-weight: bold;">$${result.newPrice}</span></div>` : ''}
-                     ${result.changePercent ? `<div><strong>Change:</strong> <span style="color: ${result.changePercent < 0 ? 'var(--positive)' : 'var(--negative)'}">${result.changePercent}%</span></div>` : ''} 
+                     ${result.newPrice ? `<div><strong>Current Price:</strong> <span style="color: var(--positive); font-weight: bold;">$${result.newPrice}</span> ${result.oldPrice ? `<span style="text-decoration: line-through; color: var(--text-muted); font-size: 0.9em; margin-left: 5px;">$${result.oldPrice}</span>` : ''}</div>` : ''}
+                     ${result.changePercent ? `<div><strong>Change:</strong> <span style="color: ${result.changePercent < 0 ? 'var(--positive)' : 'var(--negative)'}">${result.changePercent > 0 ? '+' : ''}${result.changePercent}%</span></div>` : ''} 
                 </div>
 
                 ${result.screenshotUrl ? `

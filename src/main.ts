@@ -184,8 +184,8 @@ try {
                 currentPriceStr = priceDiff?.new || '';
             }
             if (!currentPriceStr) {
-                // Global scan for first $ sign preceded or followed by a number
-                currentPriceStr = $('body').text().match(/(?:\$\s?)[0-9,]+(?:\.[0-9]{2})?/)?.[0] || '';
+                // Global scan for first $ sign followed by a number
+                currentPriceStr = $('body').text().match(/\$[\d,]+(?:\.\d+)?/)?.[0] || '';
             }
 
             const newPrice = parsePrice(currentPriceStr);
