@@ -5,5 +5,5 @@
     "description": "Get alerted when competitors change prices — without noise or false alarms. AI-powered semantic change detection.",
     "version": "1.2.0",
     "dockerfile": "./Dockerfile",
-    "input": "./.actor/INPUT_SCHEMA.json"
+    "input": "./INPUT_SCHEMA.json"
 }
