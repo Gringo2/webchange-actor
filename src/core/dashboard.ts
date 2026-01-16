@@ -73,6 +73,8 @@ export class DashboardGenerator {
         .diff-tag.add { color: var(--positive); }
         .diff-tag.rem { color: var(--negative); }
 
+        .sparkline-container { width: 100%; height: 60px; margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid var(--border); }
+        
         .visual-container { margin-top: 15px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
         .visual-container img { width: 100%; display: block; }
 
@@ -83,6 +85,7 @@ export class DashboardGenerator {
 
         .footer { margin-top: 60px; text-align: center; color: var(--text-muted); font-size: 0.8em; border-top: 1px solid var(--border); padding-top: 30px; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="header">
@@ -133,6 +136,34 @@ export class DashboardGenerator {
     <div class="footer">
         &copy; 2026 SWIM Sovereign Edition - Built for Strategic Oversight
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sparkline').forEach(canvas => {
+                const values = JSON.parse(canvas.getAttribute('data-values'));
+                new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: values.map((_, i) => i),
+                        datasets: [{
+                            data: values,
+                            borderColor: '#7952b3',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            fill: true,
+                            backgroundColor: 'rgba(121, 82, 179, 0.1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                        scales: { x: { display: false }, y: { display: false } }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
         `;
@@ -176,6 +207,12 @@ export class DashboardGenerator {
                      <div><strong>Status:</strong> <span style="color: ${result.isAvailable ? 'var(--positive)' : 'var(--negative)'}; font-weight: bold;">${result.stockStatus?.replace(/_/g, ' ').toUpperCase()}</span></div>
                      ${result.changePercent ? `<div><strong>Change:</strong> <span style="color: ${result.changePercent < 0 ? 'var(--positive)' : 'var(--negative)'}">${result.changePercent > 0 ? '+' : ''}${result.changePercent}%</span></div>` : ''} 
                 </div>
+
+                ${result.priceHistory && result.priceHistory.length > 1 ? `
+                    <div class="sparkline-container">
+                        <canvas class="sparkline" data-values="${JSON.stringify(result.priceHistory)}"></canvas>
+                    </div>
+                ` : ''}
 
                 ${result.screenshotUrl ? `
                     <div class="visual-container">

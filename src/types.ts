@@ -90,6 +90,7 @@ export interface AnalysisResult {
     oldPrice?: number;
     newPrice?: number;
     changePercent?: number;
+    priceHistory?: number[]; // Sovereign: Trend visualization
     // Stock Status
     isAvailable?: boolean;
     stockStatus?: 'in_stock' | 'out_of_stock' | 'unavailable' | 'unknown';

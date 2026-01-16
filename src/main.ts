@@ -73,6 +73,13 @@ try {
             // 2. Fetch Content (with Semantic Healing check)
             let { html: rawHtml } = await fetcher.fetch(url, activeSelector, input.proxyConfiguration);
 
+            // CAPTCHA/Bot Check
+            if (rawHtml.includes('Robot Check') || rawHtml.includes('captcha') || rawHtml.includes('Enter the characters you see below')) {
+                log.error(`⚠️ CAPTCHA DETECTED for ${url}. Consider using proxies or increasing delays.`);
+                stats.failed++;
+                continue;
+            }
+
             // Resolving AI Params (Flat > Nested)
             const apiKey = input.openaiApiKey || input.aiOptions?.apiKey;
             const model = input.aiModel || input.aiOptions?.model || 'gpt-4-turbo-preview';
@@ -212,13 +219,20 @@ try {
                 screenshotUrl = await VisualProofer.capture(url, snapshotSelector, contextSelector, input.waitForSelector) || undefined;
             }
 
-            // 9. Process Old Price for Diffs
+            // 9. Process Old Price and History for Trends
             let oldPrice: number | undefined;
             let changePercent: number | undefined;
+            const priceHistory: number[] = [];
+
+            // Build history trend (last 5 runs)
+            for (const h of history.slice(0, 5)) {
+                const hPrice = PriceExtractor.extract(h.html);
+                if (hPrice) priceHistory.push(hPrice);
+            }
+            if (newPrice) priceHistory.push(newPrice);
+
             const priceDiff = diffs.find(d => d.type === 'modified' && (d.old?.includes('$') || d.new?.includes('$') || d.selector.includes('price')));
             if (priceDiff) {
-                // Use PriceExtractor's private logic or public static for single strings
-                // We'll expose parseNumericPrice if needed, or just use extract on a small snippet
                 oldPrice = PriceExtractor.extract(`<span>${priceDiff.old}</span>`);
                 if (oldPrice && newPrice && oldPrice !== 0) {
                     changePercent = parseFloat(((newPrice - oldPrice) / oldPrice * 100).toFixed(2));
@@ -243,6 +257,7 @@ try {
                 oldPrice,
                 newPrice,
                 changePercent,
+                priceHistory,
                 isAvailable,
                 stockStatus,
                 v2: {
