@@ -23,7 +23,7 @@ export class Scorer {
             }
 
             // 2. Keyword-based scoring
-            if (SemanticClassifier.matchesKeywords(diff, preset.rules.keywords)) {
+            if (SemanticClassifier.matchesKeywords(diff, preset.rules.keywords || [])) {
                 itemScore += 30;
                 reasons.add(`Critical keyword match found in: ${diff.path}`);
             }
