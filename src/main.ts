@@ -16,6 +16,7 @@ import { HistoryStore } from './storage/history.js';
 import { Deduplicator } from './intelligence/deduplicator.js';
 import { DashboardGenerator } from './core/dashboard.js';
 import { PriceExtractor } from './intelligence/price-extractor.js';
+import { StockExtractor } from './intelligence/stock-extractor.js';
 import * as cheerio from 'cheerio';
 
 await Actor.init();
@@ -104,6 +105,7 @@ try {
             // 8. Universal Metric Extraction (Always-on)
             const $ = cheerio.load(normalizedHtml);
             const newPrice = PriceExtractor.extract(normalizedHtml, input.cssSelector);
+            const { isAvailable, status: stockStatus } = StockExtractor.extract(normalizedHtml);
             const productName = $('h1').first().text().trim() || $('title').text().trim() || 'Unknown Product';
 
             // 3. Compare with Previous Snapshot
@@ -220,6 +222,8 @@ try {
                 oldPrice,
                 newPrice,
                 changePercent,
+                isAvailable,
+                stockStatus,
                 v2: {
                     isDuplicate,
                     deduplicationHash: eventHash,

@@ -89,6 +89,9 @@ export interface AnalysisResult {
     oldPrice?: number;
     newPrice?: number;
     changePercent?: number;
+    // Stock Status
+    isAvailable?: boolean;
+    stockStatus?: 'in_stock' | 'out_of_stock' | 'unavailable' | 'unknown';
     v2?: any;
 }
 
