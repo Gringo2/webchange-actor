@@ -87,7 +87,7 @@
                     "type": "string",
                     "description": "Required if AI Analysis is enabled.",
                     "editor": "textfield",
-                    "isSecret": true
+                    "encrypted": true
                 },
                 "model": {
                     "title": "AI Model",
