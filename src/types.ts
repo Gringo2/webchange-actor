@@ -45,6 +45,7 @@ export interface PresetConfig {
     rules: {
         includeSelectors: string[];
         excludeSelectors: string[];
+        keywords?: string[]; // Keywords to boost severity score
     };
     aiPrompt?: string;
 }
