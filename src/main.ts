@@ -165,32 +165,42 @@ try {
                 screenshotUrl = await VisualProofer.capture(url, snapshotSelector, contextSelector, input.waitForSelector) || undefined;
             }
 
-            // Spreadsheet Optimization Logic
-            const priceDiff = diffs.find(d => d.type === 'modified' && (d.old?.includes('$') || d.new?.includes('$') || d.selector.includes('price')));
+            // 8. Universal Metric Extraction (Always-on)
+            const $ = cheerio.load(normalizedHtml);
+            const parsePrice = (val: string | null) => {
+                if (!val) return undefined;
+                const matches = val.match(/(?:\$\s?)([0-9,]+(?:\.[0-9]{1,2})?)/) ||
+                    val.match(/([0-9,]+\.[0-9]{2})/) ||
+                    val.match(/([0-9,]+)/);
+                if (!matches) return undefined;
+                const num = parseFloat(matches[1].replace(/,/g, ''));
+                return (isNaN(num) || num > 1000000) ? undefined : num;
+            };
+
+            // Identify current price (priority: specific selector > diff > global scan)
+            let currentPriceStr = input.cssSelector ? $(input.cssSelector).first().text().trim() : '';
+            if (!currentPriceStr) {
+                const priceDiff = diffs.find(d => d.type === 'modified' && (d.old?.includes('$') || d.new?.includes('$') || d.selector.includes('price')));
+                currentPriceStr = priceDiff?.new || '';
+            }
+            if (!currentPriceStr) {
+                // Global scan for first $ sign preceded or followed by a number
+                currentPriceStr = $('body').text().match(/(?:\$\s?)[0-9,]+(?:\.[0-9]{2})?/)?.[0] || '';
+            }
+
+            const newPrice = parsePrice(currentPriceStr);
             let oldPrice: number | undefined;
-            let newPrice: number | undefined;
             let changePercent: number | undefined;
 
+            const priceDiff = diffs.find(d => d.type === 'modified' && (d.old?.includes('$') || d.new?.includes('$') || d.selector.includes('price')));
             if (priceDiff) {
-                const parsePrice = (val: string | null) => {
-                    if (!val) return undefined;
-                    // Extract first valid price pattern (e.g., $452.15, 1,200.00, or 452)
-                    // Prioritize patterns with currency symbols or decimals
-                    const matches = val.match(/(?:\$\s?)([0-9,]+(?:\.[0-9]{1,2})?)/) || 
-                                    val.match(/([0-9,]+\.[0-9]{2})/) || 
-                                    val.match(/([0-9,]+)/);
-                    if (!matches) return undefined;
-                    const num = parseFloat(matches[1].replace(/,/g, ''));
-                    return (isNaN(num) || num > 1000000000) ? undefined : num;
-                };
                 oldPrice = parsePrice(priceDiff.old);
-                newPrice = parsePrice(priceDiff.new);
                 if (oldPrice && newPrice && oldPrice !== 0) {
                     changePercent = parseFloat(((newPrice - oldPrice) / oldPrice * 100).toFixed(2));
                 }
             }
 
-            // 8. Format Result
+            // 9. Format Result
             const result: AnalysisResult = {
                 url,
                 timestamp: new Date().toISOString(),
@@ -204,11 +214,7 @@ try {
                 screenshotUrl,
                 autoHealedSelector,
                 // Flattened Export Fields
-                productName: (() => {
-                    if (diffs[0]?.context) return diffs[0].context;
-                    const $ = cheerio.load(normalizedHtml);
-                    return $('h1').first().text().trim() || $('title').text().trim() || 'Unknown Product';
-                })(),
+                productName: diffs[0]?.context || $('h1').first().text().trim() || $('title').text().trim() || 'Unknown Product',
                 oldPrice,
                 newPrice,
                 changePercent,
