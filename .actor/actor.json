@@ -1,0 +1,9 @@
+{
+    "actorSpecification": 1,
+    "name": "semantic-web-intelligent-monitor-swim",
+    "title": "Competitor Pricing Change Monitor (AI-powered)",
+    "description": "Get alerted when competitors change prices — without noise or false alarms. AI-powered semantic change detection.",
+    "version": "1.2.0",
+    "dockerfile": "./Dockerfile",
+    "input": "./.actor/INPUT_SCHEMA.json"
+}
