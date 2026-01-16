@@ -8,6 +8,7 @@ export const InputSchema = z.object({
     preset: z.enum(['competitor-pricing', 'inventory-tracker', 'seo-intelligence', 'generic']).default('competitor-pricing'),
     cssSelector: z.string().optional(),
     useVisualProof: z.boolean().default(false),
+    discoverVariants: z.boolean().default(false), // Sovereign: Multi-variant tracking
     minSeverityToAlert: z.number().int().min(0).max(100).default(40),
     useAi: z.boolean().default(false),
     enableHealing: z.boolean().default(true), // Sovereign: Enable Self-Correcting Selectors

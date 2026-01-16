@@ -45,6 +45,13 @@
             "default": false,
             "groupCaption": "Visual Quality Control"
         },
+        "discoverVariants": {
+            "title": "Sovereign: Discover Variants",
+            "type": "boolean",
+            "description": "Automatically find and monitor all product variations (e.g., storage sizes, colors) from the page.",
+            "default": false,
+            "groupCaption": "Advanced Intelligence"
+        },
         "waitForSelector": {
             "title": "Wait for Selector",
             "type": "string",

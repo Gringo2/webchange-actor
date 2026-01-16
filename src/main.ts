@@ -17,6 +17,7 @@ import { Deduplicator } from './intelligence/deduplicator.js';
 import { DashboardGenerator } from './core/dashboard.js';
 import { PriceExtractor } from './intelligence/price-extractor.js';
 import { StockExtractor } from './intelligence/stock-extractor.js';
+import { VariantDiscoverer } from './intelligence/variant-discoverer.js';
 import * as cheerio from 'cheerio';
 
 await Actor.init();
@@ -54,11 +55,19 @@ try {
     // Results accumulator for the Dashboard
     const batchResults: AnalysisResult[] = [];
 
+    // URL Queue for Variation Discovery
+    const queue = [...targetUrls];
+    const visited = new Set<string>();
+
     // Global selector that can be "Healed" during the run
     let activeSelector = input.cssSelector;
 
-    for (const url of targetUrls) {
-        log.info(`🔍 Processing: ${url}`);
+    while (queue.length > 0) {
+        const url = queue.shift()!;
+        if (!url || visited.has(url)) continue;
+        visited.add(url);
+
+        log.info(`🔍 Processing: ${url} (${visited.size}/${queue.length + visited.size})`);
 
         try {
             // 2. Fetch Content (with Semantic Healing check)
@@ -107,6 +116,18 @@ try {
             const newPrice = PriceExtractor.extract(normalizedHtml, input.cssSelector);
             const { isAvailable, status: stockStatus } = StockExtractor.extract(normalizedHtml);
             const productName = $('h1').first().text().trim() || $('title').text().trim() || 'Unknown Product';
+
+            // Variation Discovery: If enabled, add new variants to queue
+            if (input.discoverVariants) {
+                const variants = VariantDiscoverer.discover(normalizedHtml, url);
+                variants.forEach(v => {
+                    if (!visited.has(v) && !queue.includes(v)) {
+                        queue.push(v);
+                        log.info(`➕ Variant Found: ${v}`);
+                        stats.total = (stats.total || 0) + 1; // Update total count dynamically
+                    }
+                });
+            }
 
             // 3. Compare with Previous Snapshot
             const previousHtml = await stateManager.getPrevious(url);
