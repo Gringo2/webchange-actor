@@ -174,8 +174,14 @@ try {
             if (priceDiff) {
                 const parsePrice = (val: string | null) => {
                     if (!val) return undefined;
-                    const num = parseFloat(val.replace(/[^0-9.]/g, ''));
-                    return isNaN(num) ? undefined : num;
+                    // Extract first valid price pattern (e.g., $452.15, 1,200.00, or 452)
+                    // Prioritize patterns with currency symbols or decimals
+                    const matches = val.match(/(?:\$\s?)([0-9,]+(?:\.[0-9]{1,2})?)/) || 
+                                    val.match(/([0-9,]+\.[0-9]{2})/) || 
+                                    val.match(/([0-9,]+)/);
+                    if (!matches) return undefined;
+                    const num = parseFloat(matches[1].replace(/,/g, ''));
+                    return (isNaN(num) || num > 1000000000) ? undefined : num;
                 };
                 oldPrice = parsePrice(priceDiff.old);
                 newPrice = parsePrice(priceDiff.new);
