@@ -15,6 +15,7 @@ import { gotScraping } from 'got-scraping';
 import { HistoryStore } from './storage/history.js';
 import { Deduplicator } from './intelligence/deduplicator.js';
 import { DashboardGenerator } from './core/dashboard.js';
+import { PriceExtractor } from './intelligence/price-extractor.js';
 import * as cheerio from 'cheerio';
 
 await Actor.init();
@@ -102,20 +103,7 @@ try {
 
             // 8. Universal Metric Extraction (Always-on)
             const $ = cheerio.load(normalizedHtml);
-            const parsePrice = (val: string | null) => {
-                if (!val) return undefined;
-                // Pattern prioritization: Currency > Decimals > Raw numbers
-                const matches = val.match(/(?:\$\s?)([0-9,]+(?:\.[0-9]{1,2})?)/) ||
-                    val.match(/([0-9,]+\.[0-9]{2})/) ||
-                    val.match(/([0-9,]+)/);
-                if (!matches) return undefined;
-                const num = parseFloat(matches[1].replace(/,/g, ''));
-                return (isNaN(num) || num > 1000000) ? undefined : num;
-            };
-
-            const currentPriceStr = input.cssSelector ? $(input.cssSelector).first().text().trim() :
-                $('body').text().match(/\$[\d,]+(?:\.\d+)?/)?.[0] || '';
-            const newPrice = parsePrice(currentPriceStr);
+            const newPrice = PriceExtractor.extract(normalizedHtml, input.cssSelector);
             const productName = $('h1').first().text().trim() || $('title').text().trim() || 'Unknown Product';
 
             // 3. Compare with Previous Snapshot
@@ -206,7 +194,9 @@ try {
             let changePercent: number | undefined;
             const priceDiff = diffs.find(d => d.type === 'modified' && (d.old?.includes('$') || d.new?.includes('$') || d.selector.includes('price')));
             if (priceDiff) {
-                oldPrice = parsePrice(priceDiff.old);
+                // Use PriceExtractor's private logic or public static for single strings
+                // We'll expose parseNumericPrice if needed, or just use extract on a small snippet
+                oldPrice = PriceExtractor.extract(`<span>${priceDiff.old}</span>`);
                 if (oldPrice && newPrice && oldPrice !== 0) {
                     changePercent = parseFloat(((newPrice - oldPrice) / oldPrice * 100).toFixed(2));
                 }
