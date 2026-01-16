@@ -1,8 +1,10 @@
-# <img src="./docs/assets/logo.svg" width="60" height="60" align="center" /> SWIM: Semantic Web Intelligent Monitor (V1.2 Sovereign)
+# <img src="./assets/swim-logo.png" width="60" height="60" align="center" /> Universal E-Commerce Scraper (AI-Powered)
 
-**Unbreakable. Undetectable. Autonomous.**
+**Monitor any product. On any site. Without breaking.**
 
-SWIM (Semantic Web Intelligent Monitor) is an enterprise-grade Apify Actor designed for high-accuracy tracking of pricing, inventory, and strategic shifts. The **Sovereign Edition** introduces autonomous self-healing and advanced anti-blocking, making your monitoring infrastructure virtually immune to website structural changes and bot-detection.
+This is an **AI-powered Universal Scraper** designed for high-accuracy tracking of pricing, inventory, and strategic shifts on *any* e-commerce platform (Amazon, Shopify, Walmart, WooCommerce, etc.).
+
+Unlike traditional scrapers that break when layouts change, this Actor is **Sovereign**: it uses AI to autonomously "heal" itself, bypassing anti-bot protections and adapting to structural updates in real-time.
 
 ---
 
