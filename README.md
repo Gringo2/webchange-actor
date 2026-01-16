@@ -1,4 +1,7 @@
-# <img src="./assets/swim-logo.png" width="60" height="60" align="center" /> Universal E-Commerce Scraper (AI-Powered)
+<div align="center">
+  <img src="./assets/swim-logo.png" width="120" height="120" alt="Universal E-Commerce Scraper Logo" />
+  <h1>Universal E-Commerce Scraper (AI-Powered)</h1>
+</div>
 
 **Monitor any product. On any site. Without breaking.**
 
