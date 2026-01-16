@@ -77,26 +77,20 @@
             "description": "Create a premium, dark-mode 'War Room' HTML report at the end of the run.",
             "default": true
         },
-        "aiOptions": {
-            "title": "🤖 AI Configuration",
-            "type": "object",
-            "sectionCaption": "AI Settings",
-            "properties": {
-                "apiKey": {
-                    "title": "OpenAI API Key",
-                    "type": "string",
-                    "description": "Required if AI Analysis is enabled.",
-                    "editor": "textfield",
-                    "encrypted": true
-                },
-                "model": {
-                    "title": "AI Model",
-                    "type": "string",
-                    "description": "LLM model (default: gpt-4-turbo-preview).",
-                    "editor": "textfield",
-                    "default": "gpt-4-turbo-preview"
-                }
-            }
+        "openaiApiKey": {
+            "title": "OpenAI API Key",
+            "type": "string",
+            "description": "Required if AI Analysis is enabled.",
+            "editor": "textfield",
+            "isSecret": true,
+            "sectionCaption": "AI Settings"
+        },
+        "aiModel": {
+            "title": "AI Model",
+            "type": "string",
+            "description": "LLM model (default: gpt-4-turbo-preview).",
+            "editor": "textfield",
+            "default": "gpt-4-turbo-preview"
         },
         "slackWebhookUrl": {
             "title": "Slack Webhook URL",
@@ -109,20 +103,13 @@
             "title": "Discord Webhook URL",
             "type": "string",
             "description": "Send rich, color-coded alerts directly to your Discord channel.",
-            "editor": "textfield",
-            "sectionCaption": "Notifications"
+            "editor": "textfield"
         },
-        "notificationConfig": {
-            "title": "Custom Webhook",
-            "type": "object",
-            "properties": {
-                "webhookUrl": {
-                    "title": "Generic Webhook URL",
-                    "type": "string",
-                    "description": "URL for custom integration (POST JSON).",
-                    "editor": "textfield"
-                }
-            }
+        "customWebhookUrl": {
+            "title": "Generic Webhook URL",
+            "type": "string",
+            "description": "URL for custom integration (POST JSON).",
+            "editor": "textfield"
         },
         "proxyConfiguration": {
             "title": "Proxy Configuration",

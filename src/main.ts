@@ -61,16 +61,20 @@ try {
             // 2. Fetch Content (with Semantic Healing check)
             let { html: rawHtml } = await fetcher.fetch(url, activeSelector, input.proxyConfiguration);
 
+            // Resolving AI Params (Flat > Nested)
+            const apiKey = input.openaiApiKey || input.aiOptions?.apiKey;
+            const model = input.aiModel || input.aiOptions?.model || 'gpt-4-turbo-preview';
+
             // Sovereign: Semantic Healing Logic
             let autoHealedSelector: string | undefined;
-            if (activeSelector && rawHtml.trim() === '' && input.enableHealing && input.useAi && input.aiOptions?.apiKey) {
+            if (activeSelector && rawHtml.trim() === '' && input.enableHealing && input.useAi && apiKey) {
                 log.warning(`🧯 Selector '${activeSelector}' failed. Attempting Sovereign Healing...`);
 
                 // Fetch whole page to scan for the replacement
                 const { html: fullHtml } = await fetcher.fetch(url, undefined, input.proxyConfiguration);
                 const ai = new AIInterpreter({
-                    apiKey: input.aiOptions.apiKey,
-                    model: input.aiOptions.model,
+                    apiKey: apiKey,
+                    model: model,
                 });
 
                 // Use preset ID or existing results as context
@@ -132,10 +136,10 @@ try {
             let aiAnalysis;
             const meetsThreshold = severityScore >= input.minSeverityToAlert;
 
-            if (!isDuplicate && meetsThreshold && input.useAi && input.aiOptions?.apiKey) {
+            if (!isDuplicate && meetsThreshold && input.useAi && apiKey) {
                 const ai = new AIInterpreter({
-                    apiKey: input.aiOptions.apiKey,
-                    model: input.aiOptions.model,
+                    apiKey: apiKey,
+                    model: model,
                 });
 
                 const historySummaries = await historyStore.getSummaries(url);
@@ -231,11 +235,12 @@ try {
                 if (slack) await slack.send(result);
                 if (discord) await discord.send(result);
 
-                if (input.notificationConfig?.webhookUrl) {
+                const finalWebhookUrl = input.customWebhookUrl || input.notificationConfig?.webhookUrl;
+                if (finalWebhookUrl) {
                     try {
-                        await gotScraping.post(input.notificationConfig.webhookUrl, {
+                        await gotScraping.post(finalWebhookUrl, {
                             json: result,
-                            headers: input.notificationConfig.authHeader ? { 'Authorization': input.notificationConfig.authHeader } : {},
+                            headers: input.notificationConfig?.authHeader ? { 'Authorization': input.notificationConfig.authHeader } : {},
                         });
                     } catch (e) {
                         log.error(`❌ Webhook failed for ${url}: ${(e as Error).message}`);

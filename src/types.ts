@@ -12,6 +12,10 @@ export const InputSchema = z.object({
     useAi: z.boolean().default(false),
     enableHealing: z.boolean().default(true), // Sovereign: Enable Self-Correcting Selectors
     generateDashboard: z.boolean().default(true), // Victory Lap: Premium HTML Report
+    openaiApiKey: z.string().optional(),
+    aiModel: z.string().default('gpt-4-turbo-preview'),
+    customWebhookUrl: z.string().url().optional(),
+    // Legacy mapping support
     aiOptions: z.object({
         provider: z.enum(['openai', 'anthropic']).default('openai'),
         model: z.string().optional(),
