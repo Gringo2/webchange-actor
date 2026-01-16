@@ -91,6 +91,7 @@ export interface AnalysisResult {
     newPrice?: number;
     changePercent?: number;
     priceHistory?: number[]; // Sovereign: Trend visualization
+    variantGroup?: string; // Grouping key for variants (e.g. "iPhone 15")
     // Stock Status
     isAvailable?: boolean;
     stockStatus?: 'in_stock' | 'out_of_stock' | 'unavailable' | 'unknown';

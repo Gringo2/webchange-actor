@@ -124,6 +124,9 @@ try {
             const { isAvailable, status: stockStatus } = StockExtractor.extract(normalizedHtml);
             const productName = $('h1').first().text().trim() || $('title').text().trim() || 'Unknown Product';
 
+            // Heuristic for Variant Grouping: Truncate title at first comma or paren
+            const variantGroup = productName.split(/[,\(]/)[0].trim();
+
             // Variation Discovery: If enabled, add new variants to queue
             if (input.discoverVariants) {
                 const variants = VariantDiscoverer.discover(normalizedHtml, url);
@@ -148,6 +151,7 @@ try {
                     changeDetected: false,
                     changeType: 'no_change',
                     productName,
+                    variantGroup,
                     newPrice,
                     message: 'Initial baseline created.'
                 });
@@ -168,6 +172,7 @@ try {
                     changeDetected: false,
                     changeType: 'no_change',
                     productName,
+                    variantGroup,
                     newPrice,
                     severityScore: 0,
                     message: 'Scan complete. No changes found.'
@@ -254,6 +259,7 @@ try {
                 autoHealedSelector,
                 // Flattened Export Fields
                 productName,
+                variantGroup,
                 oldPrice,
                 newPrice,
                 changePercent,
