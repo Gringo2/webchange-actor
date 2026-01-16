@@ -49,8 +49,7 @@
             "title": "Wait for Selector",
             "type": "string",
             "description": "Optional: Wait for this CSS selector before taking the screenshot (useful for slow dynamic content).",
-            "editor": "textfield",
-            "groupCaption": "Visual Quality Control"
+            "editor": "textfield"
         },
         "minSeverityToAlert": {
             "title": "Min Severity Threshold",
