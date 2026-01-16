@@ -15,6 +15,7 @@ import { gotScraping } from 'got-scraping';
 import { HistoryStore } from './storage/history.js';
 import { Deduplicator } from './intelligence/deduplicator.js';
 import { DashboardGenerator } from './core/dashboard.js';
+import * as cheerio from 'cheerio';
 
 await Actor.init();
 
@@ -197,7 +198,11 @@ try {
                 screenshotUrl,
                 autoHealedSelector,
                 // Flattened Export Fields
-                productName: diffs[0]?.context,
+                productName: (() => {
+                    if (diffs[0]?.context) return diffs[0].context;
+                    const $ = cheerio.load(normalizedHtml);
+                    return $('h1').first().text().trim() || $('title').text().trim() || 'Unknown Product';
+                })(),
                 oldPrice,
                 newPrice,
                 changePercent,
